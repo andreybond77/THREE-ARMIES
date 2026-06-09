@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Три армии | Битва</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container game-container">
+        <div class="game-header">
+            <h1>🎨 ТРИ АРМИИ</h1>
+            <div class="game-info">
+                <div class="score">
+                    <span>👤 ИГРОК: <span id="playerScore">0</span></span>
+                    <span>🤖 КОМПЬЮТЕР: <span id="computerScore">0</span></span>
+                </div>
+                <div class="difficulty-badge" id="difficultyBadge">🟢 ЛЁГКАЯ</div>
+                <button class="btn-exit" id="exitBtn">🚪 ВЫХОД</button>
+            </div>
+        </div>
+
+        <div class="board-wrapper">
+            <canvas id="boardCanvas" width="480" height="480"></canvas>
+        </div>
+
+        <div id="placementPanel" style="display: none;">
+            <div class="color-selector" id="colorSelector"></div>
+            <div class="placement-info" id="placementInfo"></div>
+        </div>
+
+        <div class="game-message" id="gameMessage">🎮 Ваш ход. Выберите шашку</div>
+        <div class="turn-indicator" id="turnIndicator">⚡ ХОДИТ: ИГРОК</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

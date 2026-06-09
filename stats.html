@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Три армии | Статистика</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container stats-container">
+        <h1>📊 СТАТИСТИКА</h1>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">👤 ПОБЕД ИГРОКА</div>
+                <div class="value" id="playerWins">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🤖 ПОБЕД КОМПЬЮТЕРА</div>
+                <div class="value" id="computerWins">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🎮 ВСЕГО ИГР</div>
+                <div class="value" id="totalGames">0</div>
+            </div>
+        </div>
+
+        <div class="stats-table">
+            <table>
+                <thead>
+                    <tr><th>СЛОЖНОСТЬ</th><th>ПОБЕД ИГРОКА</th><th>ПОБЕД КОМПЬЮТЕРА</th><th>СЫГРАНО</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>🟢 ЛЁГКАЯ</td><td id="easyPlayer">0</td><td id="easyComputer">0</td><td id="easyTotal">0</td></tr>
+                    <tr><td>🟡 СРЕДНЯЯ</td><td id="mediumPlayer">0</td><td id="mediumComputer">0</td><td id="mediumTotal">0</td></tr>
+                    <tr><td>🔴 СЛОЖНАЯ</td><td id="hardPlayer">0</td><td id="hardComputer">0</td><td id="hardTotal">0</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-reset" id="resetStatsBtn">🗑 СБРОСИТЬ СТАТИСТИКУ</button>
+            <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
