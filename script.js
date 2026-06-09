@@ -595,7 +595,7 @@ class TripleColorGame {
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const isDark = (row + col) % 2 === 1;
-                this.ctx.fillStyle = isDark ? '#2c2c3a' : '#e8e8e8';
+                this.ctx.fillStyle = isDark ? '#8B4513' : '#F0D9B5';
                 this.ctx.fillRect(col * this.cellSize, row * this.cellSize, this.cellSize, this.cellSize);
                 
                 const piece = this.board[row][col];
