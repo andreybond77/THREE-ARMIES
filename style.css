@@ -313,6 +313,9 @@ canvas {
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     cursor: pointer;
+    width: 100%;
+    height: auto;
+    max-width: 480px;
 }
 
 .game-message {
@@ -417,16 +420,267 @@ canvas {
     color: #ccc;
 }
 
+/* ==================== ПОЛНОСТЬЮ АДАПТИВНЫЙ ДИЗАЙН ==================== */
+
+/* Планшеты и маленькие ноутбуки */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 28px;
+    }
+    
+    .subtitle-game {
+        font-size: 16px;
+    }
+    
+    .cycle-item {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-width: 100px;
+    }
+    
+    .difficulty-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+    
+    .btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+/* Мобильные телефоны (ширина до 600px) */
 @media (max-width: 600px) {
-    .container { padding: 15px; }
-    .difficulty-buttons { flex-direction: column; }
-    .button-group { flex-direction: column; }
-    .score { flex-direction: column; gap: 8px; }
-    .stats-grid { grid-template-columns: 1fr; }
-    .color-selector { flex-direction: column; align-items: center; }
-    .color-btn { width: 80%; }
-    .cycle-container { flex-direction: column; }
-    .cycle-arrow { transform: rotate(90deg); }
-    .cycle-item { width: 80%; }
-    .features { grid-template-columns: 1fr; }
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 22px;
+    }
+    
+    .subtitle-game {
+        font-size: 13px;
+    }
+    
+    .main-description p {
+        font-size: 12px;
+    }
+    
+    .rules h3 {
+        font-size: 16px;
+    }
+    
+    .rules li {
+        font-size: 11px;
+        padding: 4px 0;
+    }
+    
+    .difficulty-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .difficulty-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn {
+        padding: 10px;
+        font-size: 13px;
+        width: 100%;
+    }
+    
+    .inspirational {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .inspirational p {
+        font-size: 11px;
+    }
+    
+    .features {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin: 15px 0;
+    }
+    
+    .feature {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+    
+    .footer {
+        font-size: 10px;
+    }
+    
+    /* Игровая страница */
+    .game-header h1 {
+        font-size: 18px;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .score {
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .score span {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+    
+    .difficulty-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        align-self: center;
+    }
+    
+    .btn-exit {
+        padding: 8px;
+        font-size: 13px;
+    }
+    
+    .game-message {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .turn-indicator {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .color-selector {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .color-btn {
+        width: 80%;
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .placement-info {
+        font-size: 13px;
+        padding: 8px;
+    }
+    
+    /* Статистика */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 12px;
+    }
+    
+    .stat-card .label {
+        font-size: 11px;
+    }
+    
+    .stat-card .value {
+        font-size: 26px;
+    }
+    
+    .stats-table th, 
+    .stats-table td {
+        font-size: 10px;
+        padding: 6px;
+    }
+    
+    .stats-table {
+        overflow-x: auto;
+    }
+    
+    /* Цикл цветов */
+    .cycle-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .cycle-arrow {
+        transform: rotate(90deg);
+        font-size: 20px;
+    }
+    
+    .cycle-item {
+        width: 90%;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .cycle-note {
+        font-size: 11px;
+    }
+}
+
+/* Очень маленькие телефоны (до 400px) */
+@media (max-width: 400px) {
+    .container {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 18px;
+    }
+    
+    .subtitle-game {
+        font-size: 11px;
+    }
+    
+    .rules li {
+        font-size: 10px;
+    }
+    
+    .difficulty-btn {
+        font-size: 11px;
+        padding: 8px;
+    }
+    
+    .btn {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .score span {
+        font-size: 11px;
+    }
+    
+    .game-message {
+        font-size: 11px;
+    }
+    
+    .turn-indicator {
+        font-size: 11px;
+    }
+    
+    .color-btn {
+        font-size: 13px;
+        padding: 8px;
+    }
 }
