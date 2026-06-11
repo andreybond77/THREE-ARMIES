@@ -4,19 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Три армии | Битва</title>
+    <meta name="description" content="Логическая пошаговая стратегия с тремя армиями">
     <link rel="stylesheet" href="style.css">
+    <script async src="/sdk.js" onload="initSDK()"></script>
 </head>
 <body>
     <div class="container game-container">
-        <div class="game-header">
-            <h1>🎨 ТРИ АРМИИ</h1>
-            <div class="game-info">
-                <div class="score">
-                    <span>👤 ИГРОК: <span id="playerScore">0</span></span>
-                    <span>🤖 КОМПЬЮТЕР: <span id="computerScore">0</span></span>
-                </div>
-                <div class="difficulty-badge" id="difficultyBadge">🟢 ЛЁГКАЯ</div>
-                <button class="btn-exit" id="exitBtn">🚪 ВЫХОД</button>
+        <div class="game-top-bar">
+            <h1 class="game-title-center">⚔️🏰 ТРИ АРМИИ</h1>
+            <button class="btn-exit-top" id="exitBtn">🚪 ВЫХОД</button>
+        </div>
+
+        <div class="game-info-center">
+            <div class="score-card">
+                <span class="score-label">👤 ИГРОК</span>
+                <span class="score-value" id="playerScore">0</span>
+            </div>
+            <div class="difficulty-badge-center" id="difficultyBadge">🟢 ЛЁГКАЯ</div>
+            <div class="score-card">
+                <span class="score-label">🤖 КОМПЬЮТЕР</span>
+                <span class="score-value" id="computerScore">0</span>
             </div>
         </div>
 
@@ -25,12 +32,19 @@
         </div>
 
         <div id="placementPanel" style="display: none;">
-            <div class="color-selector" id="colorSelector"></div>
-            <div class="placement-info" id="placementInfo"></div>
+            <!-- Для лёгкого режима: 3 активные круглые кнопки -->
+            <div class="color-selector-circle" id="colorSelectorCircle"></div>
+            <!-- Для среднего режима: 1 неактивная псевдо-кнопка + текст -->
+            <div class="medium-placement" id="mediumPlacement" style="display: none;">
+                <div class="medium-pseudo-piece" id="mediumPseudoPiece"></div>
+                <div class="medium-placement-text" id="mediumPlacementText"></div>
+            </div>
         </div>
 
         <div class="game-message" id="gameMessage">🎮 Ваш ход. Выберите шашку</div>
         <div class="turn-indicator" id="turnIndicator">⚡ ХОДИТ: ИГРОК</div>
+        
+        <div class="quick-hint">💡 Подсказка: клик по шашке → клик по клетке</div>
     </div>
 
     <script src="script.js"></script>
