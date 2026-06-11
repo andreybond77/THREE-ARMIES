@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Три армии | Правила</title>
+    <link rel="stylesheet" href="style.css">
+    <script async src="/sdk.js" onload="initSDK()"></script>
+</head>
+<body>
+    <div class="container rules-container">
+        <h1>📜 ПРАВИЛА ИГРЫ</h1>
+        
+        <div class="rules-section">
+            <h3>🎮 КАК ИГРАТЬ</h3>
+            <div class="how-to-play-content">
+                <div class="control-item">🖱️ Клик по шашке → выбрать армию</div>
+                <div class="control-item">🎯 Клик по клетке → отдать приказ</div>
+                <div class="control-item">⬆️⬇️⬅️➡️ Ход на 1 клетку</div>
+                <div class="control-item">↗️↖️↙️↘️ Атака по диагонали</div>
+                <div class="control-item">🔄 Обмен одинаковыми цветами</div>
+            </div>
+        </div>
+
+        <div class="rules-section">
+            <h3>📜 ПРАВИЛА</h3>
+            <ul>
+                <li>♟️ Шашки ходят: ↑ ↓ ← → (1 клетка)</li>
+                <li>⚔️ Бьют по диагонали ↗ ↖ ↘ ↙ (1 клетка)</li>
+                <li>🔄 Одинаковые цвета по диагонали → могут меняться местами</li>
+                <li>🏆 За съеденную шашку +1 очко</li>
+                <li>⚡ Игрок с большим количеством очков побеждает</li>
+            </ul>
+        </div>
+
+        <div class="rules-section predator-cycle">
+            <h3>🔄 ЦИКЛ «ХИЩНИК-ЖЕРТВА»</h3>
+            <div class="cycle-container">
+                <div class="cycle-item red">🔴 Арх<br>→ бьет 🟢 Орка</div>
+                <div class="cycle-arrow">→</div>
+                <div class="cycle-item green">🟢 Орк<br>→ бьет 🔵 Ирма</div>
+                <div class="cycle-arrow">→</div>
+                <div class="cycle-item blue">🔵 Ирм<br>→ бьет 🔴 Арха</div>
+            </div>
+            <p class="cycle-note">⚠️ Атаковать можно только те шашки, которые уязвимы для вашего цвета!</p>
+        </div>
+
+        <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

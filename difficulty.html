@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Три армии | Выбор сложности</title>
+    <link rel="stylesheet" href="style.css">
+    <script async src="/sdk.js" onload="initSDK()"></script>
+</head>
+<body>
+    <div class="container difficulty-container">
+        <h1>🎯 ВЫБОР СЛОЖНОСТИ</h1>
+        
+        <div class="difficulty-buttons-page">
+            <button class="difficulty-page-btn easy" data-diff="easy">
+                <div class="difficulty-title">🟢 ЛЁГКАЯ</div>
+                <div class="difficulty-subtitle">Ты только вступаешь на ратный путь</div>
+            </button>
+            <button class="difficulty-page-btn medium" data-diff="medium">
+                <div class="difficulty-title">🟡 СРЕДНЯЯ</div>
+                <div class="difficulty-subtitle">Ты провёл много битв</div>
+            </button>
+            <button class="difficulty-page-btn hard" data-diff="hard">
+                <div class="difficulty-title">🔴 СЛОЖНАЯ</div>
+                <div class="difficulty-subtitle">Ты — Великий полководец</div>
+            </button>
+        </div>
+
+        <div class="difficulty-description" id="difficultyDescription">
+            <p>Выберите уровень сложности, чтобы увидеть описание...</p>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-start-game" id="startGameBtn">⚔️ НАЧАТЬ БИТВУ</button>
+            <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
