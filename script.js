@@ -1,4 +1,141 @@
-// ==================== НАВИГАЦИЯ И СТАТИСТИКА ====================
+// ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
+let ysdk = null;
+let isAuthenticated = false;
+let playerName = 'ИГРОК';
+let currentLanguage = 'ru';
+let sdkInitialized = false;
+
+// ==================== ИНИЦИАЛИЗАЦИЯ SDK ====================
+async function initSDK() {
+    try {
+        if (typeof YaGames !== 'undefined') {
+            ysdk = await YaGames.init();
+            sdkInitialized = true;
+            console.log('✅ SDK Яндекс Игр инициализирован');
+            
+            await detectLanguage();
+            
+            if (ysdk.features && ysdk.features.LoadingAPI) {
+                ysdk.features.LoadingAPI.ready();
+                console.log('✅ LoadingAPI.ready() вызван');
+            }
+            
+            try {
+                const player = await ysdk.getPlayer();
+                isAuthenticated = true;
+                playerName = player.getName() || 'ИГРОК';
+                console.log(`✅ Пользователь авторизован: ${playerName}`);
+                
+                const authBtn = document.getElementById('authBtn');
+                if (authBtn) {
+                    authBtn.textContent = `👤 ${playerName}`;
+                    authBtn.style.display = 'block';
+                    authBtn.style.background = 'linear-gradient(135deg, #ff4444, #c62828)';
+                    authBtn.textContent = '🚪 ВЫЙТИ';
+                    authBtn.onclick = () => logoutFromYa();
+                }
+            } catch (e) {
+                console.log('❌ Пользователь не авторизован');
+                isAuthenticated = false;
+                
+                const authBtn = document.getElementById('authBtn');
+                if (authBtn) {
+                    authBtn.style.display = 'block';
+                    authBtn.onclick = () => loginToYa();
+                }
+            }
+            
+            if (ysdk.on) {
+                ysdk.on('pause', () => {
+                    console.log('Игра на паузе');
+                    if (window.game && window.game.isRunning) {
+                        window.game.isPaused = true;
+                        window.game.draw();
+                    }
+                });
+                ysdk.on('resume', () => {
+                    console.log('Игра возобновлена');
+                    if (window.game && window.game.isPaused) {
+                        window.game.isPaused = false;
+                        window.game.draw();
+                    }
+                });
+            }
+            return true;
+        } else {
+            console.warn('SDK Яндекс Игр не загружен');
+            return false;
+        }
+    } catch (error) {
+        console.error('Ошибка инициализации SDK:', error);
+        return false;
+    }
+}
+
+async function detectLanguage() {
+    if (ysdk) {
+        try {
+            const env = await ysdk.getEnvironment();
+            currentLanguage = env.language || 'ru';
+            console.log(`🌐 Определён язык: ${currentLanguage}`);
+        } catch (e) {
+            currentLanguage = 'ru';
+        }
+    }
+    return currentLanguage;
+}
+
+async function loginToYa() {
+    if (!ysdk) return;
+    try {
+        const player = await ysdk.getPlayer({ scopes: true });
+        isAuthenticated = true;
+        playerName = player.getName() || 'ИГРОК';
+        const authBtn = document.getElementById('authBtn');
+        if (authBtn) {
+            authBtn.textContent = `👤 ${playerName}`;
+            authBtn.style.background = 'linear-gradient(135deg, #ff4444, #c62828)';
+            authBtn.textContent = '🚪 ВЫЙТИ';
+            authBtn.onclick = () => logoutFromYa();
+        }
+        await syncStatsToCloud();
+        alert(`Добро пожаловать, ${playerName}!`);
+    } catch (error) {
+        console.error('Ошибка авторизации:', error);
+        alert('Не удалось войти в аккаунт');
+    }
+}
+
+async function logoutFromYa() {
+    if (!ysdk) return;
+    try {
+        await ysdk.getPlayer({ scopes: false, logout: true });
+        isAuthenticated = false;
+        playerName = 'ИГРОК';
+        const authBtn = document.getElementById('authBtn');
+        if (authBtn) {
+            authBtn.textContent = '🔑 ВОЙТИ В АККАУНТ';
+            authBtn.style.background = 'linear-gradient(135deg, #ffcc00, #ffaa00)';
+            authBtn.onclick = () => loginToYa();
+        }
+        alert('Вы вышли из аккаунта');
+    } catch (error) {
+        console.error('Ошибка выхода:', error);
+    }
+}
+
+async function syncStatsToCloud() {
+    if (!ysdk || !isAuthenticated) return;
+    try {
+        const stats = loadStats();
+        await ysdk.saveData({ key: 'tripleColorStats', value: JSON.stringify(stats) });
+        console.log('✅ Статистика сохранена в облако');
+    } catch (error) {
+        console.error('Ошибка сохранения в облако:', error);
+    }
+}
+
+// ==================== СТАТИСТИКА ====================
 let selectedDifficulty = localStorage.getItem('tripleColorDifficulty') || 'easy';
 
 const DEFAULT_STATS = {
@@ -17,6 +154,7 @@ function loadStats() {
 
 function saveStats(stats) {
     localStorage.setItem('tripleColorStats', JSON.stringify(stats));
+    if (isAuthenticated && ysdk) syncStatsToCloud();
 }
 
 function saveGameResult(difficulty, winner) {
@@ -48,7 +186,6 @@ function renderStats() {
 class TripleColorGame {
     constructor(difficulty) {
         this.difficulty = difficulty;
-        this.boardSize = 8;
         this.cellSize = 60;
         this.canvas = document.getElementById('boardCanvas');
         this.ctx = this.canvas.getContext('2d');
@@ -64,40 +201,34 @@ class TripleColorGame {
         this.predatorMap = { 'red': 'green', 'green': 'blue', 'blue': 'red' };
         
         this.waitingForPlacement = false;
-        this.placementRemaining = [];
+        this.placementRemaining = 0;
         this.currentPlacementColor = null;
         this.placementIndex = 0;
+        this.placementColors = [];
         
         this.setupEventListeners();
         this.initGame();
     }
     
     setupEventListeners() {
-        if (this.canvas) {
-            this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
-        }
+        if (this.canvas) this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
         const exitBtn = document.getElementById('exitBtn');
         if (exitBtn) {
             exitBtn.addEventListener('click', () => {
-                if (confirm('Выйти в главное меню?')) {
-                    window.location.href = 'index.html';
-                }
+                if (confirm('Выйти в главное меню?')) window.location.href = 'index.html';
             });
         }
     }
     
     initGame() {
-        if (this.difficulty === 'easy') {
-            this.setupEasyMode();
-        } else if (this.difficulty === 'medium') {
-            this.setupMediumMode();
-        } else {
-            this.setupHardMode();
-        }
+        if (this.difficulty === 'easy') this.setupEasyMode();
+        else if (this.difficulty === 'medium') this.setupMediumMode();
+        else this.setupHardMode();
         this.updateUI();
         this.draw();
     }
     
+    // ==================== ЛЁГКИЙ УРОВЕНЬ ====================
     setupEasyMode() {
         const computerPositions = this.getComputerPositions();
         const colorOrder = ['red', 'green', 'blue'];
@@ -106,29 +237,68 @@ class TripleColorGame {
             this.board[pos.row][pos.col] = { color: colorOrder[colorIdx % 3], player: 1 };
             colorIdx++;
         }
-        this.startPlacement(12, true, true);
-        this.showMessage('Расставьте 12 шашек. Выбирайте цвет и клетку', '#2196F3');
+        this.startPlacementEasy();
+        this.showMessage('Расставьте 12 шашек. Выбирайте цвет шашки', '#2196F3');
     }
     
+    startPlacementEasy() {
+        this.waitingForPlacement = true;
+        this.placementRemaining = 12;
+        this.selectColorMode = true;
+        this.createEasyColorSelector();
+    }
+    
+    createEasyColorSelector() {
+        const panel = document.getElementById('placementPanel');
+        panel.innerHTML = '';
+        
+        const selectorDiv = document.createElement('div');
+        selectorDiv.className = 'color-selector-circle';
+        
+        const colorMap = {
+            red: { emoji: '🔴', name: 'КРАСНАЯ' },
+            green: { emoji: '🟢', name: 'ЗЕЛЁНАЯ' },
+            blue: { emoji: '🔵', name: 'СИНЯЯ' }
+        };
+        
+        for (const color of this.colors) {
+            const btn = document.createElement('button');
+            btn.className = 'circle-piece-btn';
+            btn.setAttribute('data-color', color);
+            btn.innerHTML = colorMap[color].emoji;
+            btn.title = colorMap[color].name;
+            btn.onclick = () => {
+                this.currentPlacementColor = color;
+                this.showMessage(`Выбран цвет: ${colorMap[color].name}. Выберите клетку (осталось ${this.placementRemaining})`, '#4CAF50');
+                document.querySelectorAll('.circle-piece-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            selectorDiv.appendChild(btn);
+        }
+        
+        panel.appendChild(selectorDiv);
+        panel.style.display = 'block';
+        this.showMessage(`Выберите цвет шашки (осталось ${this.placementRemaining})`, '#2196F3');
+        this.draw();
+    }
+    
+    // ==================== СРЕДНИЙ УРОВЕНЬ ====================
     setupMediumMode() {
         const computerPositions = this.getComputerPositions();
-        const computerColors = [];
-        for (let i = 0; i < computerPositions.length; i++) {
-            computerColors.push(this.colors[Math.floor(Math.random() * 3)]);
+        const colorOrder = ['red', 'green', 'blue'];
+        let colorIdx = 0;
+        for (const pos of computerPositions) {
+            this.board[pos.row][pos.col] = { color: colorOrder[colorIdx % 3], player: 1 };
+            colorIdx++;
         }
-        for (let i = 0; i < computerPositions.length; i++) {
-            this.board[computerPositions[i].row][computerPositions[i].col] = {
-                color: computerColors[i], player: 1
-            };
-        }
+        
         this.computerBoardBackup = JSON.parse(JSON.stringify(this.board));
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                if (this.board[i][j] && this.board[i][j].player === 1) {
-                    this.board[i][j] = null;
-                }
+                if (this.board[i][j] && this.board[i][j].player === 1) this.board[i][j] = null;
             }
         }
+        
         this.startPlacementMedium();
     }
     
@@ -140,11 +310,51 @@ class TripleColorGame {
         for (let i = 0; i < 12; i++) {
             this.placementColors.push(this.colors[Math.floor(Math.random() * 3)]);
         }
-        this.selectColorMode = true;
-        this.createColorSelector();
-        this.showMessage(`Выберите цвет и клетку для шашки 1/12`, '#2196F3');
+        
+        const panel = document.getElementById('placementPanel');
+        panel.innerHTML = '';
+        
+        // Создаём контейнер для среднего режима
+        const mediumContainer = document.createElement('div');
+        mediumContainer.className = 'medium-placement';
+        
+        // Неактивная псевдо-кнопка (белый круг с эмодзи)
+        const pseudoPiece = document.createElement('div');
+        pseudoPiece.className = 'medium-pseudo-piece';
+        pseudoPiece.id = 'mediumPseudoPiece';
+        
+        // Текст подсказки
+        const textDiv = document.createElement('div');
+        textDiv.className = 'medium-placement-text';
+        textDiv.id = 'mediumPlacementText';
+        
+        mediumContainer.appendChild(pseudoPiece);
+        mediumContainer.appendChild(textDiv);
+        panel.appendChild(mediumContainer);
+        panel.style.display = 'block';
+        
+        this.updateMediumPlacementDisplay();
+        this.draw();
     }
     
+    updateMediumPlacementDisplay() {
+        const pseudoPiece = document.getElementById('mediumPseudoPiece');
+        const textDiv = document.getElementById('mediumPlacementText');
+        
+        if (!pseudoPiece || !textDiv) return;
+        
+        if (this.placementIndex < 12) {
+            const color = this.placementColors[this.placementIndex];
+            const colorMap = { red: '🔴', green: '🟢', blue: '🔵' };
+            const colorNameMap = { red: 'КРАСНУЮ', green: 'ЗЕЛЁНУЮ', blue: 'СИНЮЮ' };
+            const remaining = 12 - this.placementIndex;
+            
+            pseudoPiece.innerHTML = colorMap[color];
+            textDiv.innerHTML = `Поставьте ${colorNameMap[color]} шашку (осталось ${remaining})`;
+        }
+    }
+    
+    // ==================== СЛОЖНЫЙ УРОВЕНЬ ====================
     setupHardMode() {
         const computerPositions = this.getComputerPositions();
         const shuffledComp = [...computerPositions];
@@ -157,6 +367,7 @@ class TripleColorGame {
         for (let i = 0; i < 12; i++) {
             this.board[shuffledComp[i].row][shuffledComp[i].col] = { color: compColors[i], player: 1 };
         }
+        
         const playerPositions = this.getPlayerPositions();
         const shuffledPlayer = [...playerPositions];
         for (let i = shuffledPlayer.length - 1; i > 0; i--) {
@@ -168,38 +379,10 @@ class TripleColorGame {
         for (let i = 0; i < 12; i++) {
             this.board[shuffledPlayer[i].row][shuffledPlayer[i].col] = { color: playerColorsList[i], player: 0 };
         }
+        
         this.gameActive = true;
         this.currentPlayer = 0;
         this.showMessage('Игра началась! Ваш ход', '#4CAF50');
-        this.draw();
-    }
-    
-    startPlacement(total, selectColor, showComputer) {
-        this.waitingForPlacement = true;
-        this.placementRemaining = total;
-        this.selectColorMode = selectColor;
-        if (selectColor) {
-            this.createColorSelector();
-        }
-    }
-    
-    createColorSelector() {
-        const panel = document.getElementById('placementPanel');
-        const selector = document.getElementById('colorSelector');
-        selector.innerHTML = '';
-        for (const color of this.colors) {
-            const btn = document.createElement('button');
-            btn.className = `color-btn ${color}`;
-            btn.textContent = color === 'red' ? '🔴 КРАСНАЯ' : (color === 'green' ? '🟢 ЗЕЛЁНАЯ' : '🔵 СИНЯЯ');
-            btn.onclick = () => {
-                this.currentPlacementColor = color;
-                this.showMessage(`Выбран цвет: ${btn.textContent}. Выберите клетку`, '#4CAF50');
-                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            };
-            selector.appendChild(btn);
-        }
-        panel.style.display = 'block';
         this.draw();
     }
     
@@ -238,25 +421,28 @@ class TripleColorGame {
             return false;
         }
         
-        let color = this.currentPlacementColor;
-        if (this.difficulty === 'medium') {
-            color = this.placementColors[this.placementIndex];
-        }
-        
-        this.board[row][col] = { color: color, player: 0 };
-        this.placementRemaining--;
-        
-        if (this.difficulty === 'medium') {
-            this.placementIndex++;
-            if (this.placementIndex < 12) {
-                this.showMessage(`Шаг ${this.placementIndex + 1}/12. Выпал цвет: ${this.getColorName(this.placementColors[this.placementIndex])}. Выберите клетку`, '#ff9800');
-                this.draw();
+        if (this.difficulty === 'easy') {
+            if (!this.currentPlacementColor) {
+                this.showMessage('Сначала выберите цвет шашки', '#f44336');
+                return false;
+            }
+            this.board[row][col] = { color: this.currentPlacementColor, player: 0 };
+            this.placementRemaining--;
+            if (this.placementRemaining > 0) {
+                this.showMessage(`Выберите цвет для следующей шашки (осталось ${this.placementRemaining})`, '#2196F3');
+                document.querySelectorAll('.circle-piece-btn').forEach(b => b.classList.remove('active'));
+                this.currentPlacementColor = null;
             } else {
                 this.finishPlacement();
             }
-        } else if (this.selectColorMode) {
-            if (this.placementRemaining > 0) {
-                this.showMessage(`Выберите цвет для следующей шашки (осталось ${this.placementRemaining})`, '#2196F3');
+        } else if (this.difficulty === 'medium') {
+            this.board[row][col] = { color: this.currentPlacementColor, player: 0 };
+            this.placementIndex++;
+            if (this.placementIndex < 12) {
+                this.currentPlacementColor = this.placementColors[this.placementIndex];
+                this.updateMediumPlacementDisplay();
+                this.showMessage(`Поставьте шашку на свободную клетку`, '#4CAF50');
+                this.draw();
             } else {
                 this.finishPlacement();
             }
@@ -439,10 +625,9 @@ class TripleColorGame {
         
         if (this.difficulty === 'easy') {
             selectedMove = moves[Math.floor(Math.random() * moves.length)];
-        } 
-        else if (this.difficulty === 'medium') {
+        } else {
             for (const move of moves) {
-                let extraScore = 0;
+                let extraScore = move.score;
                 for (let dr = -1; dr <= 1; dr++) {
                     for (let dc = -1; dc <= 1; dc++) {
                         if (dr === 0 && dc === 0) continue;
@@ -457,35 +642,7 @@ class TripleColorGame {
                         }
                     }
                 }
-                move.score += extraScore;
-            }
-            moves.sort((a, b) => b.score - a.score);
-            const bestScore = moves[0].score;
-            const bestMoves = moves.filter(m => m.score === bestScore);
-            selectedMove = bestMoves[Math.floor(Math.random() * bestMoves.length)];
-        } 
-        else {
-            for (const move of moves) {
-                let globalScore = move.score;
-                let minPreyDist = Infinity;
-                let minPredatorDist = Infinity;
-                for (let i = 0; i < 8; i++) {
-                    for (let j = 0; j < 8; j++) {
-                        const p = this.board[i][j];
-                        if (p && p.player === 0) {
-                            const dist = Math.abs(move.to.row - i) + Math.abs(move.to.col - j);
-                            if (this.predatorMap[move.from.piece.color] === p.color) {
-                                minPreyDist = Math.min(minPreyDist, dist);
-                            }
-                            if (this.predatorMap[p.color] === move.from.piece.color) {
-                                minPredatorDist = Math.min(minPredatorDist, dist);
-                            }
-                        }
-                    }
-                }
-                if (minPreyDist < 4) globalScore += 40;
-                if (minPredatorDist < 3) globalScore -= 35;
-                move.score = globalScore;
+                move.score = extraScore;
             }
             moves.sort((a, b) => b.score - a.score);
             const bestScore = moves[0].score;
@@ -585,24 +742,29 @@ class TripleColorGame {
         msgDiv.style.color = color;
     }
     
-    drawSelectedHighlight(row, col) {
+    drawSelectedHighlight(row, col, cellSize) {
+        const actualCellSize = cellSize || this.cellSize;
         this.ctx.strokeStyle = '#FFD700';
         this.ctx.lineWidth = 4;
-        this.ctx.strokeRect(col * this.cellSize + 2, row * this.cellSize + 2, this.cellSize - 4, this.cellSize - 4);
+        this.ctx.strokeRect(col * actualCellSize + 2, row * actualCellSize + 2, actualCellSize - 4, actualCellSize - 4);
     }
     
     draw() {
+        const rect = this.canvas.getBoundingClientRect();
+        const scale = rect.width / 480;
+        const actualCellSize = this.cellSize * scale;
+        
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const isDark = (row + col) % 2 === 1;
                 this.ctx.fillStyle = isDark ? '#8B4513' : '#F0D9B5';
-                this.ctx.fillRect(col * this.cellSize, row * this.cellSize, this.cellSize, this.cellSize);
+                this.ctx.fillRect(col * actualCellSize, row * actualCellSize, actualCellSize, actualCellSize);
                 
                 const piece = this.board[row][col];
                 if (piece) {
-                    const centerX = col * this.cellSize + this.cellSize / 2;
-                    const centerY = row * this.cellSize + this.cellSize / 2;
-                    const radius = this.cellSize / 2 - 6;
+                    const centerX = col * actualCellSize + actualCellSize / 2;
+                    const centerY = row * actualCellSize + actualCellSize / 2;
+                    const radius = actualCellSize / 2 - 6;
                     
                     const mainColor = piece.player === 0 ? '#ffffff' : '#000000';
                     
@@ -624,13 +786,17 @@ class TripleColorGame {
                 }
             }
         }
-        if (this.selectedPiece) this.drawSelectedHighlight(this.selectedPiece.row, this.selectedPiece.col);
-        if (this.waitingForPlacement) {
+        
+        if (this.selectedPiece) {
+            this.drawSelectedHighlight(this.selectedPiece.row, this.selectedPiece.col, actualCellSize);
+        }
+        
+        if (this.waitingForPlacement && this.difficulty !== 'medium') {
             for (let row = 5; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {
                     if ((row + col) % 2 === 1 && this.board[row][col] === null) {
                         this.ctx.fillStyle = 'rgba(76, 175, 80, 0.3)';
-                        this.ctx.fillRect(col * this.cellSize, row * this.cellSize, this.cellSize, this.cellSize);
+                        this.ctx.fillRect(col * actualCellSize, row * actualCellSize, actualCellSize, actualCellSize);
                     }
                 }
             }
@@ -638,27 +804,55 @@ class TripleColorGame {
     }
 }
 
-// ==================== ИНИЦИАЛИЗАЦИЯ СТРАНИЦ ====================
-document.addEventListener('DOMContentLoaded', () => {
+// ==================== НАВИГАЦИЯ ====================
+async function initPages() {
+    await initSDK();
+    
     const filename = window.location.pathname.split('/').pop() || 'index.html';
     if (filename === 'index.html') initStartPage();
     else if (filename === 'game.html') initGamePage();
     else if (filename === 'stats.html') { renderStats(); initStatsPage(); }
-});
+    else if (filename === 'rules.html') initRulesPage();
+    else if (filename === 'difficulty.html') initDifficultyPage();
+}
 
 function initStartPage() {
-    const diffBtns = document.querySelectorAll('.difficulty-btn');
-    let selected = localStorage.getItem('tripleColorDifficulty') || 'easy';
-    diffBtns.forEach(btn => {
-        if (btn.dataset.diff === selected) btn.classList.add('active');
-        btn.addEventListener('click', () => {
-            diffBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            localStorage.setItem('tripleColorDifficulty', btn.dataset.diff);
-        });
-    });
+    document.getElementById('rulesBtn').addEventListener('click', () => window.location.href = 'rules.html');
+    document.getElementById('difficultyBtn').addEventListener('click', () => window.location.href = 'difficulty.html');
     document.getElementById('startBtn').addEventListener('click', () => window.location.href = 'game.html');
     document.getElementById('statsBtn').addEventListener('click', () => window.location.href = 'stats.html');
+}
+
+function initRulesPage() {
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
+}
+
+function initDifficultyPage() {
+    let selected = localStorage.getItem('tripleColorDifficulty') || 'easy';
+    const descriptions = {
+        easy: 'Ты только вступаешь на ратный путь, ты молод и полон решимости, ты не боишься грядущих битв, ты встречаешь врага лицом к лицу. Хоть ты и молод, но ты хорошо понимаешь тактику боя и мудро выстраиваешь боевой порядок своей армии, выбирая из разных видов войск и видя, какие боевые порядки у врагов, а у врагов уже от страха трясутся ноги, ведь им предстоит сразиться с будущим великим полководцем.',
+        medium: 'Ты провёл много битв. У тебя было много побед, и к твоей горечи были поражения. Но поражения для тебя не прошли даром, ты извлёк из них тяжёлый, трудный, но жизненно важный опыт, который впоследствии спасал твои армии в боях. Теперь, не видя противника, ты можешь выстраивать боевой порядок своей армии из предоставленных видов войск.',
+        hard: 'Ты — Великий полководец. Твой путь к вершине Олимпа неумолим и идёт шаг за шагом от победы к победе. Ты уже потерял счёт победам, но хорошо помнишь каждое своё поражение, хоть их было мало. Ты настолько мастерски овладел тактикой боя, что тебе для успешной битвы не нужно видеть боевые порядки врагов и выстраивать свои. Ты способен сражаться любой армией против любого врага.'
+    };
+    
+    const btns = document.querySelectorAll('.difficulty-page-btn');
+    btns.forEach(btn => {
+        if (btn.dataset.diff === selected) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selected = btn.dataset.diff;
+            localStorage.setItem('tripleColorDifficulty', selected);
+            const descDiv = document.getElementById('difficultyDescription');
+            descDiv.innerHTML = `<p>${descriptions[selected]}</p>`;
+        });
+    });
+    
+    const descDiv = document.getElementById('difficultyDescription');
+    descDiv.innerHTML = `<p>${descriptions[selected]}</p>`;
+    
+    document.getElementById('startGameBtn').addEventListener('click', () => window.location.href = 'game.html');
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
 }
 
 function initGamePage() {
@@ -676,3 +870,5 @@ function initStatsPage() {
     });
     document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
 }
+
+document.addEventListener('DOMContentLoaded', initPages);
