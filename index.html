@@ -4,67 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Три армии | Битва полководцев</title>
+    <meta name="description" content="Логическая пошаговая стратегия с тремя армиями">
     <link rel="stylesheet" href="style.css">
+    <script async src="/sdk.js" onload="initSDK()"></script>
 </head>
 <body>
     <div class="container start-container">
         <h1>⚔️🏰 ТРИ АРМИИ 🏰⚔️<br><span class="subtitle-game">Битва полководцев</span></h1>
+        
+        <div class="age-rating">👶 3+ | Для всех возрастов</div>
+        
         <div class="main-description">
             <p>«Три армии» — логическая пошаговая стратегия для двух игроков (человек против компьютера), сочетающая классические шашечные механики и уникальную систему трёх цветных армий, образующих замкнутый цикл «хищник-жертва».</p>
-            <p>У каждого игрока есть армии трёх цветов: 🔴 красные-Архи, 🟢 зелёные-Орки и 🔵 синие-Ирмы шашки. Они могут ходить во все стороны, а успех зависит не только от позиции, но и от правильного выбора армии для атаки.</p>
         </div>
 
-        <div class="rules">
-            <h3>📜 ПРАВИЛА ИГРЫ</h3>
-            <ul>
-                <li>♟️ Шашки ходят: ↑ ↓ ← → (1 клетка)</li>
-                <li>⚔️ Бьют по диагонали ↗ ↖ ↘ ↙ (1 клетка)</li>
-                <li>🔄 Одинаковые цвета по диагонали → могут меняться местами</li>
-                <li>🏆 За съеденную шашку +1 очко</li>
-                <li>⚡ Игрок с большим количеством очков побеждает</li>
-            </ul>
-        </div>
-
-        <div class="rules predator-cycle">
-            <h3>🔄 ЦИКЛ «ХИЩНИК-ЖЕРТВА»</h3>
-            <div class="cycle-container">
-                <div class="cycle-item red">🔴 Арх<br>→ бьет 🟢 Орка</div>
-                <div class="cycle-arrow">→</div>
-                <div class="cycle-item green">🟢 Орк<br>→ бьет 🔵 Ирма</div>
-                <div class="cycle-arrow">→</div>
-                <div class="cycle-item blue">🔵 Ирм<br>→ бьет 🔴 Арха</div>
-            </div>
-            <p class="cycle-note">⚠️ Атаковать можно только те шашки, которые уязвимы для вашего цвета!</p>
-        </div>
-
-        <div class="difficulty-section">
-            <label>🎯 ВЫБЕРИТЕ СЛОЖНОСТЬ</label>
-            <div class="difficulty-buttons">
-                <button class="difficulty-btn easy" data-diff="easy">🟢 ЛЁГКАЯ<br><small>Рандомный компьютер</small></button>
-                <button class="difficulty-btn medium" data-diff="medium">🟡 СРЕДНЯЯ<br><small>Локальная стратегия</small></button>
-                <button class="difficulty-btn hard" data-diff="hard">🔴 СЛОЖНАЯ<br><small>Глобальная стратегия</small></button>
-            </div>
-        </div>
-
-        <div class="button-group">
+        <div class="start-buttons">
+            <button class="btn btn-rules" id="rulesBtn">📜 ПРАВИЛА</button>
+            <button class="btn btn-difficulty" id="difficultyBtn">🎯 ВЫБОР СЛОЖНОСТИ</button>
             <button class="btn btn-start" id="startBtn">⚔️ НАЧАТЬ БИТВУ</button>
             <button class="btn btn-stats" id="statsBtn">📊 СТАТИСТИКА</button>
+            <button class="btn btn-auth" id="authBtn" style="display: none;">🔑 ВОЙТИ В АККАУНТ</button>
         </div>
 
-        <div class="inspirational">
-            <p>🏆 Вперёд, доблестный полководец! Тебя ждёт слава и победа в грядущих битвах.</p>
-            <p>Твоё имя будет выбито на граните олимпийской славы.</p>
-            <p>🔥 Трепещите, ничтожные враги — великий полководец сметёт ваши армии с лица земли! 🔥</p>
+        <div class="inspirational-short">
+            <p>🏆 Вперёд, доблестный полководец! Тебя ждёт слава и победа!</p>
         </div>
 
-        <div class="features">
-            <div class="feature">✅ Простое управление: клик по шашке → клик по клетке</div>
-            <div class="feature">✅ Три уровня сложности для любого опыта</div>
-            <div class="feature">✅ Сохранение статистики в браузере</div>
-            <div class="feature">✅ Адаптивный дизайн (ПК и телефон)</div>
+        <div class="footer">
+            <p>🎮 Человек vs Компьютер</p>
+            <p class="contact-email">📧 Для связи: andreybond77@mail.ru</p>
+            <p class="copyright">© 2024 ТРИ АРМИИ. Все права защищены.</p>
         </div>
-
-        <div class="footer">🎮 Человек vs Компьютер | Уничтожь вражеские армии</div>
     </div>
 
     <script src="script.js"></script>
