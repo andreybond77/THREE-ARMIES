@@ -30,6 +30,12 @@ body {
 
 .game-container {
     max-width: 650px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Градиент только для текста */
@@ -341,6 +347,7 @@ h1 {
     position: relative;
     text-align: center;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .game-title-center {
@@ -396,6 +403,8 @@ h1 {
     background: rgba(0,0,0,0.5);
     padding: 10px 20px;
     border-radius: 12px;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .score-card {
@@ -433,6 +442,8 @@ h1 {
 .board-wrapper {
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: 100%;
     margin: 20px 0;
 }
 
@@ -444,6 +455,8 @@ canvas {
     width: 100%;
     height: auto;
     max-width: 480px;
+    display: block;
+    margin: 0 auto;
 }
 
 /* Круглые кнопки-шашки для выбора цвета (лёгкий режим) */
@@ -452,6 +465,7 @@ canvas {
     justify-content: center;
     gap: 30px;
     margin: 20px 0;
+    flex-wrap: wrap;
 }
 
 .circle-piece-btn {
@@ -529,6 +543,7 @@ canvas {
     margin-bottom: 10px;
     font-size: 14px;
     color: #ff9800;
+    width: 100%;
 }
 
 .turn-indicator {
@@ -537,6 +552,7 @@ canvas {
     border-radius: 10px;
     text-align: center;
     font-weight: bold;
+    width: 100%;
 }
 
 .quick-hint {
@@ -544,6 +560,7 @@ canvas {
     margin-top: 10px;
     font-size: 11px;
     color: #888;
+    width: 100%;
 }
 
 /* ==================== СТАТИСТИКА ==================== */
@@ -741,6 +758,15 @@ canvas {
         padding: 14px 45px;
         font-size: 20px;
     }
+    
+    /* Игровая страница */
+    .game-info-center {
+        gap: 20px;
+    }
+    
+    .score-card {
+        min-width: 85px;
+    }
 }
 
 /* Мобильные телефоны (600px и меньше) */
@@ -861,6 +887,10 @@ canvas {
     }
     
     /* Игровая страница */
+    .game-container {
+        padding: 15px;
+    }
+    
     .game-top-bar {
         margin-bottom: 15px;
     }
@@ -876,7 +906,7 @@ canvas {
     }
     
     .game-info-center {
-        gap: 8px;
+        gap: 10px;
         padding: 8px 12px;
         flex-wrap: wrap;
     }
@@ -898,6 +928,14 @@ canvas {
         padding: 4px 10px;
         font-size: 11px;
         min-width: 80px;
+    }
+    
+    .board-wrapper {
+        margin: 15px 0;
+    }
+    
+    canvas {
+        max-width: calc(100% - 10px);
     }
     
     .game-message {
@@ -1020,6 +1058,7 @@ canvas {
         font-size: 12px;
     }
     
+    /* Игровая страница */
     .circle-piece-btn {
         width: 40px;
         height: 40px;
@@ -1036,6 +1075,7 @@ canvas {
         font-size: 11px;
     }
     
+    /* Статистика */
     .stats-container .btn-reset,
     .stats-container .btn-back {
         min-width: 140px;
@@ -1088,6 +1128,7 @@ canvas {
         padding: 7px;
     }
     
+    /* Игровая страница */
     .score-card {
         min-width: 60px;
     }
