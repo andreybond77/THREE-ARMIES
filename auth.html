@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Битва полководцев | Авторизация</title>
+    <meta name="description" content="Войдите в аккаунт Яндекс">
+    <link rel="stylesheet" href="style.css">
+    <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
+</head>
+<body>
+    <div class="container auth-container">
+        <h1>
+            <span class="title-emoji">🔐</span>
+            <span class="title-gradient">АВТОРИЗАЦИЯ</span>
+        </h1>
+        
+        <div class="auth-content">
+            <p>Войдите в свой аккаунт Яндекс, чтобы сохранять прогресс и соревноваться с другими игроками.</p>
+            
+            <div class="auth-buttons">
+                <button class="btn btn-yandex" id="yandexLoginBtn">🔑 ВОЙТИ ЧЕРЕЗ ЯНДЕКС ID</button>
+                <button class="btn btn-guest" id="guestBtn">👤 ПРОДОЛЖИТЬ КАК ГОСТЬ</button>
+            </div>
+        </div>
+
+        <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
