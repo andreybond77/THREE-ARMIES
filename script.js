@@ -20,30 +20,7 @@ async function initSDK() {
                 console.log('✅ LoadingAPI.ready() вызван');
             }
             
-            try {
-                const player = await ysdk.getPlayer();
-                isAuthenticated = true;
-                playerName = player.getName() || 'ИГРОК';
-                console.log(`✅ Пользователь авторизован: ${playerName}`);
-                
-                const authBtn = document.getElementById('authBtn');
-                if (authBtn) {
-                    authBtn.textContent = `👤 ${playerName}`;
-                    authBtn.style.display = 'block';
-                    authBtn.style.background = 'linear-gradient(135deg, #ff4444, #c62828)';
-                    authBtn.textContent = '🚪 ВЫЙТИ';
-                    authBtn.onclick = () => logoutFromYa();
-                }
-            } catch (e) {
-                console.log('❌ Пользователь не авторизован');
-                isAuthenticated = false;
-                
-                const authBtn = document.getElementById('authBtn');
-                if (authBtn) {
-                    authBtn.style.display = 'block';
-                    authBtn.onclick = () => loginToYa();
-                }
-            }
+            // Не проверяем авторизацию автоматически, ждём действия пользователя
             
             if (ysdk.on) {
                 ysdk.on('pause', () => {
@@ -85,53 +62,38 @@ async function detectLanguage() {
     return currentLanguage;
 }
 
+// Авторизация через Яндекс ID
 async function loginToYa() {
     if (!ysdk) return;
     try {
         const player = await ysdk.getPlayer({ scopes: true });
         isAuthenticated = true;
         playerName = player.getName() || 'ИГРОК';
-        const authBtn = document.getElementById('authBtn');
-        if (authBtn) {
-            authBtn.textContent = `👤 ${playerName}`;
-            authBtn.style.background = 'linear-gradient(135deg, #ff4444, #c62828)';
-            authBtn.textContent = '🚪 ВЫЙТИ';
-            authBtn.onclick = () => logoutFromYa();
-        }
-        await syncStatsToCloud();
+        console.log(`✅ Авторизация успешна: ${playerName}`);
+        
+        // Показываем уведомление об успешном входе
         alert(`Добро пожаловать, ${playerName}!`);
+        
+        // Возвращаемся на стартовую страницу
+        window.location.href = 'start.html';
     } catch (error) {
         console.error('Ошибка авторизации:', error);
         alert('Не удалось войти в аккаунт');
     }
 }
 
+// Выход из аккаунта (если понадобится)
 async function logoutFromYa() {
     if (!ysdk) return;
     try {
         await ysdk.getPlayer({ scopes: false, logout: true });
         isAuthenticated = false;
         playerName = 'ИГРОК';
-        const authBtn = document.getElementById('authBtn');
-        if (authBtn) {
-            authBtn.textContent = '🔑 ВОЙТИ В АККАУНТ';
-            authBtn.style.background = 'linear-gradient(135deg, #ffcc00, #ffaa00)';
-            authBtn.onclick = () => loginToYa();
-        }
+        console.log('✅ Выход из аккаунта выполнен');
         alert('Вы вышли из аккаунта');
+        window.location.href = 'start.html';
     } catch (error) {
         console.error('Ошибка выхода:', error);
-    }
-}
-
-async function syncStatsToCloud() {
-    if (!ysdk || !isAuthenticated) return;
-    try {
-        const stats = loadStats();
-        await ysdk.saveData({ key: 'tripleColorStats', value: JSON.stringify(stats) });
-        console.log('✅ Статистика сохранена в облако');
-    } catch (error) {
-        console.error('Ошибка сохранения в облако:', error);
     }
 }
 
@@ -154,7 +116,6 @@ function loadStats() {
 
 function saveStats(stats) {
     localStorage.setItem('tripleColorStats', JSON.stringify(stats));
-    if (isAuthenticated && ysdk) syncStatsToCloud();
 }
 
 function saveGameResult(difficulty, winner) {
@@ -180,6 +141,105 @@ function renderStats() {
     document.getElementById('hardPlayer').textContent = s.hard.player;
     document.getElementById('hardComputer').textContent = s.hard.computer;
     document.getElementById('hardTotal').textContent = s.hard.games;
+}
+
+// ==================== НАВИГАЦИЯ ====================
+
+function initFacadePage() {
+    const menuBtn = document.getElementById('facadeMenuBtn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+            window.location.href = 'start.html';
+        });
+    }
+}
+
+function initStartPage() {
+    document.getElementById('rulesBtn').addEventListener('click', () => window.location.href = 'rules.html');
+    document.getElementById('difficultyBtn').addEventListener('click', () => window.location.href = 'difficulty.html');
+    document.getElementById('startBtn').addEventListener('click', () => window.location.href = 'game.html');
+    document.getElementById('statsBtn').addEventListener('click', () => window.location.href = 'stats.html');
+    
+    const authBtn = document.getElementById('authBtn');
+    if (authBtn) {
+        authBtn.addEventListener('click', () => window.location.href = 'auth.html');
+    }
+}
+
+function initAuthPage() {
+    const yandexBtn = document.getElementById('yandexLoginBtn');
+    const guestBtn = document.getElementById('guestBtn');
+    const backBtn = document.getElementById('backBtn');
+    
+    if (yandexBtn) {
+        yandexBtn.addEventListener('click', () => {
+            if (typeof loginToYa === 'function') {
+                loginToYa();
+            } else {
+                alert('Функция авторизации временно недоступна');
+            }
+        });
+    }
+    
+    if (guestBtn) {
+        guestBtn.addEventListener('click', () => {
+            window.location.href = 'start.html';
+        });
+    }
+    
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'start.html';
+        });
+    }
+}
+
+function initRulesPage() {
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'start.html');
+}
+
+function initDifficultyPage() {
+    let selected = localStorage.getItem('tripleColorDifficulty') || 'easy';
+    const descriptions = {
+        easy: 'Ты только вступаешь на ратный путь, ты молод и полон решимости, ты не боишься грядущих битв, ты встречаешь врага лицом к лицу. Хоть ты и молод, но ты хорошо понимаешь тактику боя и мудро выстраиваешь боевой порядок своей армии, выбирая из разных видов войск и видя, какие боевые порядки у врагов, а у врагов уже от страха трясутся ноги, ведь им предстоит сразиться с будущим великим полководцем.',
+        medium: 'Ты провёл много битв. У тебя было много побед, и к твоей горечи были поражения. Но поражения для тебя не прошли даром, ты извлёк из них тяжёлый, трудный, но жизненно важный опыт, который впоследствии спасал твои армии в боях. Теперь, не видя противника, ты можешь выстраивать боевой порядок своей армии из предоставленных видов войск.',
+        hard: 'Ты — Великий полководец. Твой путь к вершине Олимпа неумолим и идёт шаг за шагом от победы к победе. Ты уже потерял счёт победам, но хорошо помнишь каждое своё поражение, хоть их было мало. Ты настолько мастерски овладел тактикой боя, что тебе для успешной битвы не нужно видеть боевые порядки врагов и выстраивать свои. Ты способен сражаться любой армией против любого врага.'
+    };
+    
+    const btns = document.querySelectorAll('.difficulty-page-btn');
+    btns.forEach(btn => {
+        if (btn.dataset.diff === selected) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selected = btn.dataset.diff;
+            localStorage.setItem('tripleColorDifficulty', selected);
+            const descDiv = document.getElementById('difficultyDescription');
+            descDiv.innerHTML = `<p>${descriptions[selected]}</p>`;
+        });
+    });
+    
+    const descDiv = document.getElementById('difficultyDescription');
+    descDiv.innerHTML = `<p>${descriptions[selected]}</p>`;
+    
+    document.getElementById('startGameBtn').addEventListener('click', () => window.location.href = 'game.html');
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'start.html');
+}
+
+function initStatsPage() {
+    document.getElementById('resetStatsBtn').addEventListener('click', () => {
+        if (confirm('⚠️ Сбросить всю статистику?')) {
+            localStorage.removeItem('tripleColorStats');
+            renderStats();
+            alert('✅ Статистика сброшена!');
+        }
+    });
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'start.html');
+}
+
+function initGamePage() {
+    const difficulty = localStorage.getItem('tripleColorDifficulty') || 'easy';
+    window.game = new TripleColorGame(difficulty);
 }
 
 // ==================== КЛАСС ИГРЫ ====================
@@ -314,16 +374,13 @@ class TripleColorGame {
         const panel = document.getElementById('placementPanel');
         panel.innerHTML = '';
         
-        // Создаём контейнер для среднего режима
         const mediumContainer = document.createElement('div');
         mediumContainer.className = 'medium-placement';
         
-        // Неактивная псевдо-кнопка (белый круг с эмодзи)
         const pseudoPiece = document.createElement('div');
         pseudoPiece.className = 'medium-pseudo-piece';
         pseudoPiece.id = 'mediumPseudoPiece';
         
-        // Текст подсказки
         const textDiv = document.createElement('div');
         textDiv.className = 'medium-placement-text';
         textDiv.id = 'mediumPlacementText';
@@ -804,71 +861,28 @@ class TripleColorGame {
     }
 }
 
-// ==================== НАВИГАЦИЯ ====================
+// ==================== ГЛАВНАЯ ИНИЦИАЛИЗАЦИЯ ====================
 async function initPages() {
     await initSDK();
     
     const filename = window.location.pathname.split('/').pop() || 'index.html';
-    if (filename === 'index.html') initStartPage();
-    else if (filename === 'game.html') initGamePage();
-    else if (filename === 'stats.html') { renderStats(); initStatsPage(); }
-    else if (filename === 'rules.html') initRulesPage();
-    else if (filename === 'difficulty.html') initDifficultyPage();
-}
-
-function initStartPage() {
-    document.getElementById('rulesBtn').addEventListener('click', () => window.location.href = 'rules.html');
-    document.getElementById('difficultyBtn').addEventListener('click', () => window.location.href = 'difficulty.html');
-    document.getElementById('startBtn').addEventListener('click', () => window.location.href = 'game.html');
-    document.getElementById('statsBtn').addEventListener('click', () => window.location.href = 'stats.html');
-}
-
-function initRulesPage() {
-    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
-}
-
-function initDifficultyPage() {
-    let selected = localStorage.getItem('tripleColorDifficulty') || 'easy';
-    const descriptions = {
-        easy: 'Ты только вступаешь на ратный путь, ты молод и полон решимости, ты не боишься грядущих битв, ты встречаешь врага лицом к лицу. Хоть ты и молод, но ты хорошо понимаешь тактику боя и мудро выстраиваешь боевой порядок своей армии, выбирая из разных видов войск и видя, какие боевые порядки у врагов, а у врагов уже от страха трясутся ноги, ведь им предстоит сразиться с будущим великим полководцем.',
-        medium: 'Ты провёл много битв. У тебя было много побед, и к твоей горечи были поражения. Но поражения для тебя не прошли даром, ты извлёк из них тяжёлый, трудный, но жизненно важный опыт, который впоследствии спасал твои армии в боях. Теперь, не видя противника, ты можешь выстраивать боевой порядок своей армии из предоставленных видов войск.',
-        hard: 'Ты — Великий полководец. Твой путь к вершине Олимпа неумолим и идёт шаг за шагом от победы к победе. Ты уже потерял счёт победам, но хорошо помнишь каждое своё поражение, хоть их было мало. Ты настолько мастерски овладел тактикой боя, что тебе для успешной битвы не нужно видеть боевые порядки врагов и выстраивать свои. Ты способен сражаться любой армией против любого врага.'
-    };
     
-    const btns = document.querySelectorAll('.difficulty-page-btn');
-    btns.forEach(btn => {
-        if (btn.dataset.diff === selected) btn.classList.add('active');
-        btn.addEventListener('click', () => {
-            btns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selected = btn.dataset.diff;
-            localStorage.setItem('tripleColorDifficulty', selected);
-            const descDiv = document.getElementById('difficultyDescription');
-            descDiv.innerHTML = `<p>${descriptions[selected]}</p>`;
-        });
-    });
-    
-    const descDiv = document.getElementById('difficultyDescription');
-    descDiv.innerHTML = `<p>${descriptions[selected]}</p>`;
-    
-    document.getElementById('startGameBtn').addEventListener('click', () => window.location.href = 'game.html');
-    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
-}
-
-function initGamePage() {
-    const difficulty = localStorage.getItem('tripleColorDifficulty') || 'easy';
-    window.game = new TripleColorGame(difficulty);
-}
-
-function initStatsPage() {
-    document.getElementById('resetStatsBtn').addEventListener('click', () => {
-        if (confirm('⚠️ Сбросить всю статистику?')) {
-            localStorage.removeItem('tripleColorStats');
-            renderStats();
-            alert('✅ Статистика сброшена!');
-        }
-    });
-    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
+    if (filename === 'index.html') {
+        initFacadePage();
+    } else if (filename === 'start.html') {
+        initStartPage();
+    } else if (filename === 'game.html') {
+        initGamePage();
+    } else if (filename === 'stats.html') {
+        renderStats();
+        initStatsPage();
+    } else if (filename === 'rules.html') {
+        initRulesPage();
+    } else if (filename === 'difficulty.html') {
+        initDifficultyPage();
+    } else if (filename === 'auth.html') {
+        initAuthPage();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', initPages);
