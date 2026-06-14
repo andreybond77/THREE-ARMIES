@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Три армии | Статистика</title>
-    <meta name="description" content="Статистика побед в игре Три армии">
+    <title>Битва полководцев | Статистика</title>
+    <meta name="description" content="Статистика побед в игре">
     <link rel="stylesheet" href="style.css">
-    <script async src="/sdk.js" onload="initSDK()"></script>
+    <!-- Yandex Games SDK (временно отключён для локальной разработки) -->
+    <!-- <script src="https://sdk.games.s3.yandex.net/sdk.js"></script> -->
 </head>
 <body>
     <div class="container stats-container">
-        <h1>📊 СТАТИСТИКА</h1>
+        <h1>
+            <span class="title-emoji">📊</span>
+            <span class="title-gradient">СТАТИСТИКА</span>
+        </h1>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -30,7 +34,12 @@
         <div class="stats-table">
             <table>
                 <thead>
-                    <tr><th>СЛОЖНОСТЬ</th><th>ПОБЕД ИГРОКА</th><th>ПОБЕД КОМПЬЮТЕРА</th><th>СЫГРАНО</th></tr>
+                    <tr>
+                        <th>СЛОЖНОСТЬ</th>
+                        <th>ПОБЕД ИГРОКА</th>
+                        <th>ПОБЕД КОМПЬЮТЕРА</th>
+                        <th>СЫГРАНО</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr><td>🟢 ЛЁГКАЯ</td><td id="easyPlayer">0</td><td id="easyComputer">0</td><td id="easyTotal">0</td></tr>
@@ -46,7 +55,7 @@
         </div>
         
         <div class="footer">
-            <p class="copyright">© 2024 ТРИ АРМИИ. Все права защищены.</p>
+            <p class="copyright">© 2024 БИТВА ПОЛКОВОДЦЕВ. Все права защищены.</p>
         </div>
     </div>
 
