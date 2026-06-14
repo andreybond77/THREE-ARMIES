@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Три армии | Битва</title>
+    <title>Битва полководцев | Битва</title>
     <meta name="description" content="Логическая пошаговая стратегия с тремя армиями">
     <link rel="stylesheet" href="style.css">
-    <script async src="/sdk.js" onload="initSDK()"></script>
+    <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
 </head>
 <body>
     <div class="container game-container">
         <div class="game-top-bar">
-            <h1 class="game-title-center">⚔️🏰 ТРИ АРМИИ</h1>
-            <button class="btn-exit-top" id="exitBtn">🚪 ВЫХОД</button>
+            <h1>
+                <span class="title-emoji">⚔️</span>
+                <span class="title-gradient">ПОЛЕ БОЯ</span>
+                <span class="title-emoji">⚔️</span>
+            </h1>
+            <button class="btn-exit-circle" id="exitBtn" title="Выйти">🚪</button>
         </div>
 
         <div class="game-info-center">
@@ -32,9 +36,7 @@
         </div>
 
         <div id="placementPanel" style="display: none;">
-            <!-- Для лёгкого режима: 3 активные круглые кнопки -->
             <div class="color-selector-circle" id="colorSelectorCircle"></div>
-            <!-- Для среднего режима: 1 неактивная псевдо-кнопка + текст -->
             <div class="medium-placement" id="mediumPlacement" style="display: none;">
                 <div class="medium-pseudo-piece" id="mediumPseudoPiece"></div>
                 <div class="medium-placement-text" id="mediumPlacementText"></div>
