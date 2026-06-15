@@ -162,7 +162,7 @@ h1 {
     font-size: 11px;
 }
 
-/* ==================== СТРАНИЦА ПРАВИЛ (rules.html) ==================== */
+/* ==================== СТРАНИЦА ПРАВИЛ ==================== */
 .rules-container {
     max-width: 800px;
     margin: 0 auto;
@@ -628,33 +628,76 @@ canvas {
 }
 
 /* ==================== ФАСАДНАЯ СТРАНИЦА ==================== */
-
 .facade-body {
-    padding: 0;
     margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.facade-flex-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
     background-image: url('imag/background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: scroll;
-    min-height: 100vh;
+    background-attachment: fixed;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: flex-start;
-    text-align: center;
-    padding-top: 250px;
+    align-items: center;
+    position: relative;
+}
+
+.facade-flex-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.facade-title-wrapper,
+.facade-description-wrapper,
+.facade-btn-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.facade-title-wrapper {
+    margin-top: 25%;
+    margin-bottom: 30%;
+}
+
+.facade-description-wrapper {
+    margin-top: 0;
+    margin-bottom: 10%;
+}
+
+.facade-btn-wrapper {
+    margin-top: 0;
+    margin-bottom: 15%;
 }
 
 .facade-title {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
     flex-wrap: wrap;
+    padding: 0 20px;
 }
 
 .facade-title-text {
@@ -662,7 +705,8 @@ canvas {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-size: 40px;
+    font-size: 48px;
+    font-weight: bold;
     letter-spacing: 1px;
 }
 
@@ -671,17 +715,17 @@ canvas {
 }
 
 .facade-description {
-    margin-bottom: 150px;
-    color: #ffffff;
-    font-size: 18px;
-    line-height: 1.6;
     max-width: 600px;
     padding: 0 20px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    text-align: center;
 }
 
 .facade-description p {
     margin: 0;
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .facade-btn {
@@ -694,12 +738,12 @@ canvas {
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .facade-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     background: linear-gradient(135deg, #43a047, #1b5e20);
 }
 
@@ -707,159 +751,101 @@ canvas {
     transform: translateY(0px);
 }
 
-/* Адаптация для планшетов */
+/* ===== АДАПТАЦИЯ ДЛЯ ФАСАДНОЙ СТРАНИЦЫ ===== */
 @media (max-width: 768px) {
-    .facade-body {
-        padding-top: 150px;
-    }
-    
-    .facade-title {
-        font-size: 38px;
-        margin-bottom: 100px;
-        gap: 12px;
-    }
-    
     .facade-title-text {
-        font-size: 34px;
+        font-size: 38px;
     }
-    
     .facade-emoji {
         font-size: 38px;
     }
-    
-    .facade-description {
+    .facade-description p {
         font-size: 16px;
-        margin-bottom: 80px;
-        max-width: 500px;
     }
-    
     .facade-btn {
         padding: 14px 45px;
         font-size: 20px;
     }
 }
 
-/* Адаптация для мобильных телефонов */
 @media (max-width: 600px) {
-    .facade-body {
-        padding-top: 80px;
-        background-attachment: scroll;
+    .facade-title-wrapper {
+        margin-top: 15%;
+        margin-bottom: 6%;
     }
-    
-    .facade-title {
-        font-size: 28px;
-        margin-bottom: 50px;
-        gap: 10px;
+    .facade-description-wrapper {
+        margin-bottom: 8%;
     }
-    
+    .facade-btn-wrapper {
+        margin-bottom: 10%;
+    }
     .facade-title-text {
-        font-size: 24px;
+        font-size: 28px;
     }
-    
     .facade-emoji {
         font-size: 28px;
     }
-    
-    .facade-description {
+    .facade-description p {
         font-size: 14px;
-        margin-bottom: 50px;
-        padding: 0 15px;
-        max-width: 90%;
     }
-    
     .facade-btn {
         padding: 12px 35px;
         font-size: 18px;
     }
 }
 
-/* Адаптация для маленьких мобильных телефонов */
 @media (max-width: 480px) {
-    .facade-body {
-        padding-top: 50px;
-    }
-    
-    .facade-title {
-        font-size: 24px;
-        margin-bottom: 40px;
-        gap: 8px;
-    }
-    
     .facade-title-text {
-        font-size: 20px;
+        font-size: 24px;
     }
-    
     .facade-emoji {
         font-size: 24px;
     }
-    
-    .facade-description {
+    .facade-description p {
         font-size: 13px;
-        margin-bottom: 40px;
     }
-    
     .facade-btn {
         padding: 10px 25px;
         font-size: 16px;
     }
 }
 
-/* Адаптация для очень маленьких экранов */
 @media (max-width: 360px) {
-    .facade-body {
-        padding-top: 30px;
-    }
-    
-    .facade-title {
-        font-size: 20px;
-        margin-bottom: 30px;
-        gap: 6px;
-    }
-    
     .facade-title-text {
-        font-size: 16px;
+        font-size: 20px;
     }
-    
     .facade-emoji {
         font-size: 20px;
     }
-    
-    .facade-description {
+    .facade-description p {
         font-size: 12px;
-        margin-bottom: 30px;
     }
-    
     .facade-btn {
         padding: 8px 20px;
         font-size: 14px;
     }
 }
 
-/* Горизонтальная ориентация на мобильных */
 @media (max-height: 500px) and (orientation: landscape) {
-    .facade-body {
-        padding-top: 30px;
+    .facade-title-wrapper {
+        margin-top: 8%;
+        margin-bottom: 4%;
     }
-    
-    .facade-title {
-        font-size: 28px;
-        margin-bottom: 20px;
+    .facade-description-wrapper {
+        margin-bottom: 5%;
     }
-    
+    .facade-btn-wrapper {
+        margin-bottom: 8%;
+    }
     .facade-title-text {
-        font-size: 24px;
+        font-size: 28px;
     }
-    
     .facade-emoji {
         font-size: 28px;
     }
-    
-    .facade-description {
+    .facade-description p {
         font-size: 13px;
-        margin-bottom: 20px;
-        max-width: 80%;
     }
-    
     .facade-btn {
         padding: 8px 30px;
         font-size: 16px;
@@ -867,515 +853,291 @@ canvas {
 }
 
 /* ==================== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (ВСЕ СТРАНИЦЫ) ==================== */
-
-/* Планшеты (768px - 601px) */
 @media (max-width: 768px) {
     .container {
         padding: 20px;
     }
-    
     h1 {
         font-size: 28px;
     }
-    
     .subtitle-game {
         font-size: 16px;
     }
-    
     .difficulty-page-btn {
         padding: 15px;
     }
-    
     .difficulty-title {
         font-size: 18px;
     }
-    
     .btn {
         padding: 12px;
         font-size: 14px;
     }
-    
-    /* Фасадная страница */
-    .facade-title {
-        font-size: 38px;
-        gap: 12px;
-    }
-    
-    .facade-title-text {
-        font-size: 34px;
-    }
-    
-    .facade-emoji {
-        font-size: 38px;
-    }
-    
-    .facade-description {
-        font-size: 16px;
-        margin-bottom: 35px;
-    }
-    
-    .facade-btn {
-        padding: 14px 45px;
-        font-size: 20px;
-    }
-    
-    /* Игровая страница */
     .game-info-center {
         gap: 20px;
     }
-    
     .score-card {
         min-width: 85px;
     }
 }
 
-/* Мобильные телефоны (600px и меньше) */
 @media (max-width: 600px) {
     body {
         padding: 10px;
     }
-    
     .container {
         padding: 15px;
     }
-    
     h1 {
         font-size: 22px;
         gap: 5px;
     }
-    
     .title-gradient {
         font-size: 22px;
     }
-    
     .subtitle-game {
         font-size: 13px;
     }
-    
     .main-description p {
         font-size: 12px;
     }
-    
     .start-buttons {
         gap: 10px;
     }
-    
     .btn {
         padding: 10px;
         font-size: 13px;
     }
-    
-    /* Правила */
     .rules-container li {
         font-size: 12px;
         padding: 4px 0;
     }
-    
     .rules-container .btn-back {
         width: 160px;
         padding: 10px 20px;
         font-size: 14px;
     }
-    
-    /* Авторизация */
     .auth-container {
         max-width: 95%;
     }
-    
     .auth-content {
         padding: 20px;
     }
-    
     .auth-content p {
         font-size: 14px;
     }
-    
-    /* Цикл цветов */
     .cycle-container {
         flex-direction: column;
         gap: 8px;
     }
-    
     .cycle-arrow {
         transform: rotate(90deg);
         font-size: 20px;
     }
-    
     .cycle-item {
         width: 90%;
         padding: 8px 12px;
         font-size: 12px;
     }
-    
     .cycle-note {
         font-size: 11px;
     }
-    
-    /* Выбор сложности */
     .difficulty-buttons-page {
         flex-direction: column;
         gap: 10px;
     }
-    
     .difficulty-page-btn {
         padding: 12px;
     }
-    
     .difficulty-title {
         font-size: 16px;
     }
-    
     .difficulty-subtitle {
         font-size: 10px;
     }
-    
     .difficulty-description {
         font-size: 12px;
         padding: 15px;
         min-height: 120px;
     }
-    
     .button-group {
         flex-direction: column;
         gap: 10px;
     }
-    
     .button-group .btn {
         width: 100%;
         padding: 10px;
         font-size: 13px;
     }
-    
-    /* Игровая страница */
     .game-container {
         padding: 15px;
     }
-    
     .game-top-bar {
         margin-bottom: 15px;
     }
-    
     .game-title-center {
         font-size: 16px;
     }
-    
     .btn-exit-circle {
         width: 40px;
         height: 40px;
         font-size: 20px;
     }
-    
     .game-info-center {
         gap: 10px;
         padding: 8px 12px;
         flex-wrap: wrap;
     }
-    
     .score-card {
         min-width: 70px;
         padding: 3px 8px;
     }
-    
     .score-label {
         font-size: 9px;
     }
-    
     .score-value {
         font-size: 16px;
     }
-    
     .difficulty-badge-center {
         padding: 4px 10px;
         font-size: 11px;
         min-width: 80px;
     }
-    
     .board-wrapper {
         margin: 15px 0;
     }
-    
     canvas {
         max-width: calc(100% - 10px);
     }
-    
     .game-message {
         font-size: 11px;
         padding: 8px;
     }
-    
     .turn-indicator {
         font-size: 11px;
         padding: 8px;
     }
-    
     .quick-hint {
         font-size: 9px;
     }
-    
     .color-selector-circle {
         gap: 15px;
     }
-    
     .circle-piece-btn {
         width: 45px;
         height: 45px;
         font-size: 24px;
     }
-    
     .medium-pseudo-piece {
         width: 45px;
         height: 45px;
         font-size: 24px;
     }
-    
     .medium-placement-text {
         font-size: 12px;
         padding: 5px 10px;
     }
-    
-    /* Статистика */
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 10px;
     }
-    
     .stat-card {
         padding: 12px;
     }
-    
     .stat-card .label {
         font-size: 11px;
     }
-    
     .stat-card .value {
         font-size: 24px;
     }
-    
     .stats-table th,
     .stats-table td {
         font-size: 10px;
         padding: 6px;
     }
-    
     .stats-container .btn-reset,
     .stats-container .btn-back {
         min-width: 160px;
         padding: 10px 16px;
         font-size: 13px;
     }
-    
     .stats-container .button-group {
         gap: 12px;
     }
-    
-    /* Фасадная страница */
-    .facade-body {
-        padding-top: 60px;
-    }
-    
-    .facade-title {
-        font-size: 28px;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-    
-    .facade-title-text {
-        font-size: 24px;
-    }
-    
-    .facade-emoji {
-        font-size: 28px;
-    }
-    
-    .facade-description {
-        font-size: 14px;
-        margin-bottom: 30px;
-        padding: 0 15px;
-    }
-    
-    .facade-btn {
-        padding: 12px 35px;
-        font-size: 18px;
-    }
 }
 
-/* Маленькие мобильные телефоны (480px и меньше) */
 @media (max-width: 480px) {
     .container {
         padding: 12px;
     }
-    
     h1 {
         font-size: 18px;
     }
-    
     .title-gradient {
         font-size: 18px;
     }
-    
     .btn {
         padding: 8px;
         font-size: 12px;
     }
-    
-    /* Игровая страница */
     .circle-piece-btn {
         width: 40px;
         height: 40px;
         font-size: 20px;
     }
-    
     .medium-pseudo-piece {
         width: 40px;
         height: 40px;
         font-size: 20px;
     }
-    
     .medium-placement-text {
         font-size: 11px;
     }
-    
-    /* Статистика */
     .stats-container .btn-reset,
     .stats-container .btn-back {
         min-width: 140px;
         padding: 8px 12px;
         font-size: 12px;
     }
-    
-    /* Фасадная страница */
-    .facade-body {
-        padding-top: 40px;
-    }
-    
-    .facade-title {
-        font-size: 24px;
-        gap: 8px;
-        margin-bottom: 15px;
-    }
-    
-    .facade-title-text {
-        font-size: 20px;
-    }
-    
-    .facade-emoji {
-        font-size: 24px;
-    }
-    
-    .facade-description {
-        font-size: 13px;
-        margin-bottom: 25px;
-    }
-    
-    .facade-btn {
-        padding: 10px 25px;
-        font-size: 16px;
-    }
 }
 
-/* Очень маленькие экраны (360px и меньше) */
 @media (max-width: 360px) {
     h1 {
         font-size: 16px;
     }
-    
     .title-gradient {
         font-size: 16px;
     }
-    
     .btn {
         font-size: 11px;
         padding: 7px;
     }
-    
-    /* Игровая страница */
     .score-card {
         min-width: 60px;
     }
-    
     .score-value {
         font-size: 14px;
     }
-    
     .difficulty-badge-center {
         font-size: 10px;
         padding: 3px 8px;
     }
-    
     .circle-piece-btn {
         width: 35px;
         height: 35px;
         font-size: 18px;
     }
-    
     .medium-pseudo-piece {
         width: 35px;
         height: 35px;
         font-size: 18px;
     }
-    
-    /* Фасадная страница */
-    .facade-body {
-        padding-top: 30px;
-    }
-    
-    .facade-title {
-        font-size: 20px;
-        gap: 6px;
-    }
-    
-    .facade-title-text {
-        font-size: 16px;
-    }
-    
-    .facade-emoji {
-        font-size: 20px;
-    }
-    
-    .facade-description {
-        font-size: 12px;
-        margin-bottom: 20px;
-    }
-    
-    .facade-btn {
-        padding: 8px 20px;
-        font-size: 14px;
-    }
 }
 
-/* Горизонтальная ориентация на мобильных */
 @media (max-height: 500px) and (orientation: landscape) {
-    .facade-body {
-        padding-top: 20px;
-    }
-    
-    .facade-title {
-        font-size: 28px;
-        margin-bottom: 15px;
-    }
-    
-    .facade-title-text {
-        font-size: 24px;
-    }
-    
-    .facade-emoji {
-        font-size: 28px;
-    }
-    
-    .facade-description {
-        font-size: 13px;
-        margin-bottom: 20px;
-    }
-    
-    .facade-btn {
-        padding: 10px 35px;
-        font-size: 16px;
-    }
-    
     .game-info-center {
         gap: 15px;
     }
-    
     .score-card {
         min-width: 80px;
     }
