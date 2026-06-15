@@ -9,15 +9,30 @@
     <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
 </head>
 <body class="facade-body">
-    <div class="facade-title">
-        <span class="facade-emoji">⚔️</span>
-        <span class="facade-title-text">БИТВА ПОЛКОВОДЦЕВ</span>
-        <span class="facade-emoji">⚔️</span>
+    <div class="facade-flex-container">
+        
+        <!-- Flex-контейнер для заголовка -->
+        <div class="facade-title-wrapper">
+            <div class="facade-title">
+                <span class="facade-emoji">⚔️</span>
+                <span class="facade-title-text">БИТВА ПОЛКОВОДЦЕВ</span>
+                <span class="facade-emoji">⚔️</span>
+            </div>
+        </div>
+        
+        <!-- Flex-контейнер для описания -->
+        <div class="facade-description-wrapper">
+            <div class="facade-description">
+                <p>Логическая пошаговая стратегия, где герой нанимает три цветные расы и сражается с противником (ИИ) по принципу «хищник-жертва».</p>
+            </div>
+        </div>
+        
+        <!-- Flex-контейнер для кнопки -->
+        <div class="facade-btn-wrapper">
+            <button class="facade-btn" id="facadeMenuBtn">🎮 МЕНЮ</button>
+        </div>
+        
     </div>
-    <div class="facade-description">
-        <p>Логическая пошаговая стратегия, где герой нанимает три цветные расы и сражается с противником (ИИ) по принципу «хищник-жертва».</p>
-    </div>
-    <button class="facade-btn" id="facadeMenuBtn">🎮 МЕНЮ</button>
 
     <script src="script.js"></script>
 </body>
