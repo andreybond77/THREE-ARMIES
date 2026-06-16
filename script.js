@@ -20,8 +20,6 @@ async function initSDK() {
                 console.log('✅ LoadingAPI.ready() вызван');
             }
             
-            // Не проверяем авторизацию автоматически, ждём действия пользователя
-            
             if (ysdk.on) {
                 ysdk.on('pause', () => {
                     console.log('Игра на паузе');
@@ -71,10 +69,7 @@ async function loginToYa() {
         playerName = player.getName() || 'ИГРОК';
         console.log(`✅ Авторизация успешна: ${playerName}`);
         
-        // Показываем уведомление об успешном входе
         alert(`Добро пожаловать, ${playerName}!`);
-        
-        // Возвращаемся на стартовую страницу
         window.location.href = 'start.html';
     } catch (error) {
         console.error('Ошибка авторизации:', error);
@@ -82,7 +77,6 @@ async function loginToYa() {
     }
 }
 
-// Выход из аккаунта (если понадобится)
 async function logoutFromYa() {
     if (!ysdk) return;
     try {
@@ -250,6 +244,15 @@ class TripleColorGame {
         this.canvas = document.getElementById('boardCanvas');
         this.ctx = this.canvas.getContext('2d');
         
+        // Устанавливаем внутреннее разрешение канваса
+        this.canvas.width = 480;
+        this.canvas.height = 480;
+        
+        // Добавляем обработчик изменения размера окна
+        window.addEventListener('resize', () => {
+            this.draw();
+        });
+        
         this.currentPlayer = 0;
         this.playerScore = 0;
         this.computerScore = 0;
@@ -265,13 +268,30 @@ class TripleColorGame {
         this.currentPlacementColor = null;
         this.placementIndex = 0;
         this.placementColors = [];
+        this.computerBoardBackup = null;
+        this.selectColorMode = false;
+        this.isPaused = false;
         
         this.setupEventListeners();
         this.initGame();
     }
     
     setupEventListeners() {
-        if (this.canvas) this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+        if (this.canvas) {
+            this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+            // Добавляем touch события для мобильных
+            this.canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseEvent = new MouseEvent('click', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                this.handleCanvasClick(mouseEvent);
+            }, { passive: false });
+        }
+        
         const exitBtn = document.getElementById('exitBtn');
         if (exitBtn) {
             exitBtn.addEventListener('click', () => {
@@ -370,6 +390,7 @@ class TripleColorGame {
         for (let i = 0; i < 12; i++) {
             this.placementColors.push(this.colors[Math.floor(Math.random() * 3)]);
         }
+        this.currentPlacementColor = this.placementColors[0];
         
         const panel = document.getElementById('placementPanel');
         panel.innerHTML = '';
@@ -534,6 +555,7 @@ class TripleColorGame {
     
     handleCanvasClick(e) {
         if (!this.gameActive && !this.waitingForPlacement) return;
+        if (this.isPaused) return;
         
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
@@ -561,7 +583,6 @@ class TripleColorGame {
                 this.selectedPiece = { row, col, piece };
                 this.showMessage(`Выбрана ${this.getColorName(piece.color)} шашка. Выберите клетку`, '#4CAF50');
                 this.draw();
-                this.drawSelectedHighlight(row, col);
             } else {
                 this.showMessage('Выберите свою шашку', '#f44336');
             }
@@ -629,6 +650,10 @@ class TripleColorGame {
     
     computerMove() {
         if (!this.gameActive || this.currentPlayer !== 1) return;
+        if (this.isPaused) {
+            setTimeout(() => this.computerMove(), 100);
+            return;
+        }
         
         const computerPieces = [];
         for (let i = 0; i < 8; i++) {
@@ -799,8 +824,8 @@ class TripleColorGame {
         msgDiv.style.color = color;
     }
     
-    drawSelectedHighlight(row, col, cellSize) {
-        const actualCellSize = cellSize || this.cellSize;
+    drawSelectedHighlight(row, col) {
+        const actualCellSize = this.cellSize;
         this.ctx.strokeStyle = '#FFD700';
         this.ctx.lineWidth = 4;
         this.ctx.strokeRect(col * actualCellSize + 2, row * actualCellSize + 2, actualCellSize - 4, actualCellSize - 4);
@@ -810,6 +835,8 @@ class TripleColorGame {
         const rect = this.canvas.getBoundingClientRect();
         const scale = rect.width / 480;
         const actualCellSize = this.cellSize * scale;
+        
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
@@ -833,7 +860,7 @@ class TripleColorGame {
                     this.ctx.lineWidth = 1.5;
                     this.ctx.stroke();
                     
-                    const emojiSize = radius - 4;
+                    const emojiSize = Math.max(radius - 4, 10);
                     this.ctx.font = `${emojiSize}px "Segoe UI"`;
                     this.ctx.fillStyle = '#333';
                     this.ctx.textAlign = 'center';
@@ -845,7 +872,7 @@ class TripleColorGame {
         }
         
         if (this.selectedPiece) {
-            this.drawSelectedHighlight(this.selectedPiece.row, this.selectedPiece.col, actualCellSize);
+            this.drawSelectedHighlight(this.selectedPiece.row, this.selectedPiece.col);
         }
         
         if (this.waitingForPlacement && this.difficulty !== 'medium') {
