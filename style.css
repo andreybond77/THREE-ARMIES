@@ -1,6 +1,8 @@
 * {
     user-select: none;
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -36,6 +38,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 10px;
 }
 
 /* Градиент только для текста */
@@ -444,7 +447,8 @@ h1 {
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin: 20px 0;
+    margin: 15px 0;
+    padding: 0 5px;
 }
 
 canvas {
@@ -452,11 +456,13 @@ canvas {
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     cursor: pointer;
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: auto !important;
     max-width: 480px;
+    aspect-ratio: 1 / 1;
     display: block;
     margin: 0 auto;
+    background: #333;
 }
 
 /* Круглые кнопки-шашки для выбора цвета (лёгкий режим) */
@@ -634,6 +640,7 @@ canvas {
     width: 100%;
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
 }
 
 .facade-flex-container {
@@ -643,14 +650,15 @@ canvas {
     width: 100%;
     height: 100vh;
     background-image: url('imag/background.jpg');
-    background-size: cover;
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: scroll;
+    background-color: #1a1a2e;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
+    padding: clamp(15px, 3vh, 40px);
     position: relative;
 }
 
@@ -661,174 +669,11 @@ canvas {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.15);
     z-index: 1;
 }
 
-/* ===== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (БЕЗ ОБРЕЗАНИЯ) ===== */
-
-/* Планшеты */
-@media (max-width: 768px) {
-    .facade-flex-container {
-        background-size: contain;
-        background-position: center;
-        background-attachment: scroll;
-        background-color: #1a1a2e;
-    }
-    
-    .facade-title-text {
-        font-size: 38px;
-    }
-    
-    .facade-emoji {
-        font-size: 38px;
-    }
-    
-    .facade-description p {
-        font-size: 16px;
-    }
-    
-    .facade-btn {
-        padding: 14px 45px;
-        font-size: 20px;
-    }
-}
-
-/* Мобильные телефоны */
-@media (max-width: 600px) {
-    .facade-flex-container {
-        background-size: contain;
-        background-position: center;
-        background-attachment: scroll;
-        background-color: #1a1a2e;
-    }
-    
-    .facade-title-wrapper {
-        margin-top: 15%;
-        margin-bottom: 6%;
-    }
-    
-    .facade-description-wrapper {
-        margin-bottom: 8%;
-    }
-    
-    .facade-btn-wrapper {
-        margin-bottom: 10%;
-    }
-    
-    .facade-title-text {
-        font-size: 28px;
-    }
-    
-    .facade-emoji {
-        font-size: 28px;
-    }
-    
-    .facade-description p {
-        font-size: 14px;
-    }
-    
-    .facade-btn {
-        padding: 12px 35px;
-        font-size: 18px;
-    }
-}
-
-/* Маленькие телефоны */
-@media (max-width: 480px) {
-    .facade-flex-container {
-        background-size: contain;
-        background-position: center;
-        background-attachment: scroll;
-        background-color: #1a1a2e;
-    }
-    
-    .facade-title-text {
-        font-size: 24px;
-    }
-    
-    .facade-emoji {
-        font-size: 24px;
-    }
-    
-    .facade-description p {
-        font-size: 13px;
-    }
-    
-    .facade-btn {
-        padding: 10px 25px;
-        font-size: 16px;
-    }
-}
-
-/* Очень маленькие экраны */
-@media (max-width: 360px) {
-    .facade-flex-container {
-        background-size: contain;
-        background-position: center;
-        background-attachment: scroll;
-        background-color: #1a1a2e;
-    }
-    
-    .facade-title-text {
-        font-size: 20px;
-    }
-    
-    .facade-emoji {
-        font-size: 20px;
-    }
-    
-    .facade-description p {
-        font-size: 12px;
-    }
-    
-    .facade-btn {
-        padding: 8px 20px;
-        font-size: 14px;
-    }
-}
-
-/* Горизонтальная ориентация */
-@media (max-height: 500px) and (orientation: landscape) {
-    .facade-flex-container {
-        background-size: contain;
-        background-position: center;
-        background-attachment: scroll;
-        background-color: #1a1a2e;
-    }
-    
-    .facade-title-wrapper {
-        margin-top: 8%;
-        margin-bottom: 4%;
-    }
-    
-    .facade-description-wrapper {
-        margin-bottom: 5%;
-    }
-    
-    .facade-btn-wrapper {
-        margin-bottom: 8%;
-    }
-    
-    .facade-title-text {
-        font-size: 28px;
-    }
-    
-    .facade-emoji {
-        font-size: 28px;
-    }
-    
-    .facade-description p {
-        font-size: 13px;
-    }
-    
-    .facade-btn {
-        padding: 8px 30px;
-        font-size: 16px;
-    }
-}
-
-/* ===== ОСТАЛЬНЫЕ СТИЛИ (не меняются) ===== */
+/* ===== ОТСТУПЫ ДЛЯ WRAPPER'ов (индивидуальные) ===== */
 .facade-title-wrapper,
 .facade-description-wrapper,
 .facade-btn-wrapper {
@@ -838,30 +683,30 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex: 0 0 auto;
 }
 
+/* Индивидуальные отступы для каждого wrapper'а */
 .facade-title-wrapper {
-    margin-top: 25%;
-    margin-bottom: 30%;
+    margin-bottom: 30px; /* ← Отступ после заголовка */
 }
 
 .facade-description-wrapper {
-    margin-top: 0;
-    margin-bottom: 10%;
+    margin-bottom: 40px; /* ← Отступ после описания */
 }
 
 .facade-btn-wrapper {
-    margin-top: 0;
-    margin-bottom: 15%;
+    margin-top: 10px; /* ← Отступ перед кнопкой */
 }
 
+/* ===== СТИЛИ ЗАГОЛОВКА ===== */
 .facade-title {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    gap: clamp(8px, 2vw, 15px);
     flex-wrap: wrap;
-    padding: 0 20px;
+    padding: 0 10px;
 }
 
 .facade-title-text {
@@ -869,40 +714,44 @@ canvas {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-size: 48px;
+    font-size: clamp(24px, 6vw, 48px);
     font-weight: bold;
     letter-spacing: 1px;
+    text-align: center;
 }
 
 .facade-emoji {
-    font-size: 48px;
+    font-size: clamp(24px, 6vw, 48px);
 }
 
+/* ===== СТИЛИ ОПИСАНИЯ ===== */
 .facade-description {
-    max-width: 600px;
-    padding: 0 20px;
+    max-width: min(600px, 90%);
+    padding: 0 10px;
     text-align: center;
 }
 
 .facade-description p {
     margin: 0;
     color: #ffffff;
-    font-size: 18px;
+    font-size: clamp(14px, 2.5vw, 18px);
     line-height: 1.6;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
+/* ===== СТИЛИ КНОПКИ ===== */
 .facade-btn {
     background: linear-gradient(135deg, #4CAF50, #2e7d32);
     border: none;
     border-radius: 50px;
-    padding: 16px 55px;
-    font-size: 22px;
+    padding: clamp(12px, 2.5vh, 16px) clamp(30px, 6vw, 55px);
+    font-size: clamp(16px, 3vw, 22px);
     font-weight: bold;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
 }
 
 .facade-btn:hover {
@@ -916,107 +765,351 @@ canvas {
 }
 
 /* ===== АДАПТАЦИЯ ДЛЯ ФАСАДНОЙ СТРАНИЦЫ ===== */
-@media (max-width: 768px) {
-    .facade-title-text {
-        font-size: 38px;
-    }
-    .facade-emoji {
-        font-size: 38px;
-    }
-    .facade-description p {
-        font-size: 16px;
-    }
-    .facade-btn {
-        padding: 14px 45px;
-        font-size: 20px;
+
+/* Планшеты и мобильные - фон не обрезается */
+@media (max-width: 1024px) {
+    .facade-flex-container {
+        background-size: contain;
+        background-position: center;
+        background-attachment: scroll;
+        background-color: #1a1a2e;
     }
 }
 
+/* Мобильные телефоны */
 @media (max-width: 600px) {
+    .facade-flex-container {
+        padding: clamp(10px, 2vh, 20px);
+        justify-content: center;
+        background-size: contain;
+        background-position: center;
+    }
+    
+    /* Уменьшаем отступы на мобильных */
     .facade-title-wrapper {
-        margin-top: 15%;
-        margin-bottom: 6%;
+        margin-bottom: 15px;
     }
+    
     .facade-description-wrapper {
-        margin-bottom: 8%;
+        margin-bottom: 20px;
     }
+    
     .facade-btn-wrapper {
-        margin-bottom: 10%;
+        margin-top: 5px;
     }
+    
+    .facade-title {
+        gap: 5px;
+    }
+    
     .facade-title-text {
-        font-size: 28px;
+        font-size: clamp(20px, 5vw, 28px);
     }
+    
     .facade-emoji {
-        font-size: 28px;
+        font-size: clamp(20px, 5vw, 28px);
     }
+    
     .facade-description p {
+        font-size: clamp(12px, 2vw, 14px);
+    }
+    
+    .facade-btn {
+        padding: 10px 25px;
+        font-size: 16px;
+        white-space: normal;
+    }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 360px) {
+    .facade-title-wrapper {
+        margin-bottom: 10px;
+    }
+    
+    .facade-description-wrapper {
+        margin-bottom: 15px;
+    }
+    
+    .facade-btn-wrapper {
+        margin-top: 3px;
+    }
+    
+    .facade-title-text {
+        font-size: 16px;
+    }
+    
+    .facade-emoji {
+        font-size: 16px;
+    }
+    
+    .facade-description p {
+        font-size: 11px;
+    }
+    
+    .facade-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Горизонтальная ориентация */
+@media (max-height: 500px) and (orientation: landscape) {
+    .facade-flex-container {
+        padding: 10px 20px;
+        justify-content: center;
+        background-size: contain;
+        background-position: center;
+    }
+    
+    .facade-title-wrapper {
+        margin-bottom: 10px;
+    }
+    
+    .facade-description-wrapper {
+        margin-bottom: 15px;
+    }
+    
+    .facade-btn-wrapper {
+        margin-top: 5px;
+    }
+    
+    .facade-title-text {
+        font-size: 22px;
+    }
+    
+    .facade-emoji {
+        font-size: 22px;
+    }
+    
+    .facade-description p {
+        font-size: 12px;
+    }
+    
+    .facade-btn {
+        padding: 6px 20px;
         font-size: 14px;
     }
-    .facade-btn {
-        padding: 12px 35px;
+}
+
+/* Большие экраны (десктоп) - можно использовать cover */
+@media (min-width: 1025px) {
+    .facade-flex-container {
+        background-size: cover;
+        background-position: center;
+    }
+}
+
+/* ===== АДАПТАЦИЯ ИГРОВОЙ СТРАНИЦЫ ДЛЯ МОБИЛЬНЫХ ===== */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 8px;
+    }
+    
+    .board-wrapper {
+        margin: 10px 0;
+        padding: 0 4px;
+    }
+    
+    canvas {
+        max-width: calc(100vw - 30px);
+        max-height: calc(100vw - 30px);
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+    }
+    
+    .game-top-bar {
+        margin-bottom: 10px;
+    }
+    
+    .game-title-center {
         font-size: 18px;
+    }
+    
+    .btn-exit-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .game-info-center {
+        gap: 15px;
+        padding: 8px 15px;
+        flex-wrap: wrap;
+    }
+    
+    .score-card {
+        min-width: 80px;
+        padding: 4px 10px;
+    }
+    
+    .score-label {
+        font-size: 10px;
+    }
+    
+    .score-value {
+        font-size: 18px;
+    }
+    
+    .difficulty-badge-center {
+        padding: 5px 12px;
+        font-size: 12px;
+        min-width: 90px;
+    }
+    
+    .color-selector-circle {
+        gap: 20px;
+    }
+    
+    .circle-piece-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+    }
+    
+    .medium-pseudo-piece {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+    }
+    
+    .medium-placement-text {
+        font-size: 13px;
     }
 }
 
 @media (max-width: 480px) {
-    .facade-title-text {
-        font-size: 24px;
+    .game-container {
+        padding: 6px;
     }
-    .facade-emoji {
-        font-size: 24px;
+    
+    .board-wrapper {
+        margin: 8px 0;
+        padding: 0 3px;
     }
-    .facade-description p {
-        font-size: 13px;
+    
+    canvas {
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vw - 20px);
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
     }
-    .facade-btn {
-        padding: 10px 25px;
+    
+    .game-title-center {
         font-size: 16px;
+    }
+    
+    .btn-exit-circle {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    .game-info-center {
+        gap: 10px;
+        padding: 6px 10px;
+    }
+    
+    .score-card {
+        min-width: 65px;
+        padding: 3px 6px;
+    }
+    
+    .score-value {
+        font-size: 16px;
+    }
+    
+    .difficulty-badge-center {
+        font-size: 10px;
+        padding: 4px 8px;
+        min-width: 70px;
+    }
+    
+    .color-selector-circle {
+        gap: 15px;
+    }
+    
+    .circle-piece-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .medium-pseudo-piece {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .medium-placement-text {
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+    
+    .game-message {
+        font-size: 12px;
+        padding: 6px;
+    }
+    
+    .turn-indicator {
+        font-size: 12px;
+        padding: 6px;
+    }
+    
+    .quick-hint {
+        font-size: 10px;
     }
 }
 
 @media (max-width: 360px) {
-    .facade-title-text {
-        font-size: 20px;
+    .game-container {
+        padding: 4px;
     }
-    .facade-emoji {
-        font-size: 20px;
+    
+    .board-wrapper {
+        margin: 5px 0;
+        padding: 0 2px;
     }
-    .facade-description p {
-        font-size: 12px;
+    
+    canvas {
+        max-width: calc(100vw - 12px);
+        max-height: calc(100vw - 12px);
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
     }
-    .facade-btn {
-        padding: 8px 20px;
+    
+    .score-card {
+        min-width: 55px;
+        padding: 2px 5px;
+    }
+    
+    .score-value {
         font-size: 14px;
     }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-    .facade-title-wrapper {
-        margin-top: 8%;
-        margin-bottom: 4%;
+    
+    .difficulty-badge-center {
+        font-size: 9px;
+        padding: 3px 6px;
+        min-width: 60px;
     }
-    .facade-description-wrapper {
-        margin-bottom: 5%;
+    
+    .circle-piece-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
     }
-    .facade-btn-wrapper {
-        margin-bottom: 8%;
-    }
-    .facade-title-text {
-        font-size: 28px;
-    }
-    .facade-emoji {
-        font-size: 28px;
-    }
-    .facade-description p {
-        font-size: 13px;
-    }
-    .facade-btn {
-        padding: 8px 30px;
-        font-size: 16px;
+    
+    .medium-pseudo-piece {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
     }
 }
 
-/* ==================== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (ВСЕ СТРАНИЦЫ) ==================== */
+/* ===== АДАПТАЦИЯ ДЛЯ ОСТАЛЬНЫХ СТРАНИЦ ===== */
 @media (max-width: 768px) {
     .container {
         padding: 20px;
@@ -1133,74 +1226,6 @@ canvas {
         padding: 10px;
         font-size: 13px;
     }
-    .game-container {
-        padding: 15px;
-    }
-    .game-top-bar {
-        margin-bottom: 15px;
-    }
-    .game-title-center {
-        font-size: 16px;
-    }
-    .btn-exit-circle {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
-    .game-info-center {
-        gap: 10px;
-        padding: 8px 12px;
-        flex-wrap: wrap;
-    }
-    .score-card {
-        min-width: 70px;
-        padding: 3px 8px;
-    }
-    .score-label {
-        font-size: 9px;
-    }
-    .score-value {
-        font-size: 16px;
-    }
-    .difficulty-badge-center {
-        padding: 4px 10px;
-        font-size: 11px;
-        min-width: 80px;
-    }
-    .board-wrapper {
-        margin: 15px 0;
-    }
-    canvas {
-        max-width: calc(100% - 10px);
-    }
-    .game-message {
-        font-size: 11px;
-        padding: 8px;
-    }
-    .turn-indicator {
-        font-size: 11px;
-        padding: 8px;
-    }
-    .quick-hint {
-        font-size: 9px;
-    }
-    .color-selector-circle {
-        gap: 15px;
-    }
-    .circle-piece-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 24px;
-    }
-    .medium-pseudo-piece {
-        width: 45px;
-        height: 45px;
-        font-size: 24px;
-    }
-    .medium-placement-text {
-        font-size: 12px;
-        padding: 5px 10px;
-    }
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -1244,19 +1269,6 @@ canvas {
         padding: 8px;
         font-size: 12px;
     }
-    .circle-piece-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
-    .medium-pseudo-piece {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
-    .medium-placement-text {
-        font-size: 11px;
-    }
     .stats-container .btn-reset,
     .stats-container .btn-back {
         min-width: 140px;
@@ -1275,26 +1287,6 @@ canvas {
     .btn {
         font-size: 11px;
         padding: 7px;
-    }
-    .score-card {
-        min-width: 60px;
-    }
-    .score-value {
-        font-size: 14px;
-    }
-    .difficulty-badge-center {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
-    .circle-piece-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 18px;
-    }
-    .medium-pseudo-piece {
-        width: 35px;
-        height: 35px;
-        font-size: 18px;
     }
 }
 
