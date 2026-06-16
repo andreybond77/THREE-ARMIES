@@ -646,7 +646,7 @@ canvas {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: scroll;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -665,6 +665,170 @@ canvas {
     z-index: 1;
 }
 
+/* ===== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (БЕЗ ОБРЕЗАНИЯ) ===== */
+
+/* Планшеты */
+@media (max-width: 768px) {
+    .facade-flex-container {
+        background-size: contain;
+        background-position: center;
+        background-attachment: scroll;
+        background-color: #1a1a2e;
+    }
+    
+    .facade-title-text {
+        font-size: 38px;
+    }
+    
+    .facade-emoji {
+        font-size: 38px;
+    }
+    
+    .facade-description p {
+        font-size: 16px;
+    }
+    
+    .facade-btn {
+        padding: 14px 45px;
+        font-size: 20px;
+    }
+}
+
+/* Мобильные телефоны */
+@media (max-width: 600px) {
+    .facade-flex-container {
+        background-size: contain;
+        background-position: center;
+        background-attachment: scroll;
+        background-color: #1a1a2e;
+    }
+    
+    .facade-title-wrapper {
+        margin-top: 15%;
+        margin-bottom: 6%;
+    }
+    
+    .facade-description-wrapper {
+        margin-bottom: 8%;
+    }
+    
+    .facade-btn-wrapper {
+        margin-bottom: 10%;
+    }
+    
+    .facade-title-text {
+        font-size: 28px;
+    }
+    
+    .facade-emoji {
+        font-size: 28px;
+    }
+    
+    .facade-description p {
+        font-size: 14px;
+    }
+    
+    .facade-btn {
+        padding: 12px 35px;
+        font-size: 18px;
+    }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 480px) {
+    .facade-flex-container {
+        background-size: contain;
+        background-position: center;
+        background-attachment: scroll;
+        background-color: #1a1a2e;
+    }
+    
+    .facade-title-text {
+        font-size: 24px;
+    }
+    
+    .facade-emoji {
+        font-size: 24px;
+    }
+    
+    .facade-description p {
+        font-size: 13px;
+    }
+    
+    .facade-btn {
+        padding: 10px 25px;
+        font-size: 16px;
+    }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 360px) {
+    .facade-flex-container {
+        background-size: contain;
+        background-position: center;
+        background-attachment: scroll;
+        background-color: #1a1a2e;
+    }
+    
+    .facade-title-text {
+        font-size: 20px;
+    }
+    
+    .facade-emoji {
+        font-size: 20px;
+    }
+    
+    .facade-description p {
+        font-size: 12px;
+    }
+    
+    .facade-btn {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Горизонтальная ориентация */
+@media (max-height: 500px) and (orientation: landscape) {
+    .facade-flex-container {
+        background-size: contain;
+        background-position: center;
+        background-attachment: scroll;
+        background-color: #1a1a2e;
+    }
+    
+    .facade-title-wrapper {
+        margin-top: 8%;
+        margin-bottom: 4%;
+    }
+    
+    .facade-description-wrapper {
+        margin-bottom: 5%;
+    }
+    
+    .facade-btn-wrapper {
+        margin-bottom: 8%;
+    }
+    
+    .facade-title-text {
+        font-size: 28px;
+    }
+    
+    .facade-emoji {
+        font-size: 28px;
+    }
+    
+    .facade-description p {
+        font-size: 13px;
+    }
+    
+    .facade-btn {
+        padding: 8px 30px;
+        font-size: 16px;
+    }
+}
+
+/* ===== ОСТАЛЬНЫЕ СТИЛИ (не меняются) ===== */
 .facade-title-wrapper,
 .facade-description-wrapper,
 .facade-btn-wrapper {
