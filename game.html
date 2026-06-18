@@ -2,53 +2,55 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Битва полководцев | Битва</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Битва полководцев | Поле боя</title>
     <meta name="description" content="Логическая пошаговая стратегия с тремя армиями">
-    <link rel="stylesheet" href="style.css">
-    <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
+    <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
-    <div class="container game-container">
-        <div class="game-top-bar">
-            <h1>
-                <span class="title-emoji">⚔️</span>
+    <div class="game">
+        <div class="header">
+            <h1><span class="title-emoji">️</span>
                 <span class="title-gradient">ПОЛЕ БОЯ</span>
                 <span class="title-emoji">⚔️</span>
-            </h1>
-            <button class="btn-exit-circle" id="exitBtn" title="Выйти">🚪</button>
-        </div>
-
-        <div class="game-info-center">
-            <div class="score-card">
-                <span class="score-label">👤 ИГРОК</span>
-                <span class="score-value" id="playerScore">0</span>
-            </div>
-            <div class="difficulty-badge-center" id="difficultyBadge">🟢 ЛЁГКАЯ</div>
-            <div class="score-card">
-                <span class="score-label">🤖 КОМПЬЮТЕР</span>
-                <span class="score-value" id="computerScore">0</span>
+           </h1>
+            <div class="header-controls">
+                <button class="icon-btn sound-btn" id="soundBtn" aria-label="Включить/выключить звук">🔊</button>
+                <button class="icon-btn exit-btn" id="exitBtn" aria-label="Выйти в меню">✕</button>
             </div>
         </div>
 
-        <div class="board-wrapper">
-            <canvas id="boardCanvas" width="480" height="480"></canvas>
-        </div>
-
-        <div id="placementPanel" style="display: none;">
-            <div class="color-selector-circle" id="colorSelectorCircle"></div>
-            <div class="medium-placement" id="mediumPlacement" style="display: none;">
-                <div class="medium-pseudo-piece" id="mediumPseudoPiece"></div>
-                <div class="medium-placement-text" id="mediumPlacementText"></div>
+        <div class="score">
+            <div class="score-item">
+                <span class="lbl">👤 ИГРОК</span>
+                <span class="val" id="playerScore">0</span>
+            </div>
+            <div class="diff-badge" id="difficultyBadge">⏳ ЗАГРУЗКА...</div>
+            <div class="score-item">
+                <span class="lbl">🤖 КОМПЬЮТЕР</span>
+                <span class="val" id="computerScore">0</span>
             </div>
         </div>
 
-        <div class="game-message" id="gameMessage">🎮 Ваш ход. Выберите шашку</div>
-        <div class="turn-indicator" id="turnIndicator">⚡ ХОДИТ: ИГРОК</div>
-        
-        <div class="quick-hint">💡 Подсказка: клик по шашке → клик по клетке</div>
+        <div class="board-wrap">
+            <canvas id="boardCanvas"></canvas>
+        </div>
+
+        <div class="placement-panel" id="placementPanel">
+            <div class="color-selector" id="colorSelector"></div>
+            <div class="medium-place" id="mediumPlace" style="display:none;">
+                <div class="medium-piece" id="mediumPiece"></div>
+                <div class="medium-text" id="mediumText"></div>
+            </div>
+        </div>
+
+        <div class="game-info" id="gameInfo">
+            <div class="game-info-turn" id="turnIndicator">⚡ ХОДИТ: ИГРОК</div>
+            <div class="game-info-msg" id="gameMessage">🎮 Ваш ход. Выберите шашку</div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>
