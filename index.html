@@ -5,35 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Битва полководцев | Добро пожаловать</title>
     <meta name="description" content="Логическая пошаговая стратегия с тремя расами">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
     <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
 </head>
-<body class="facade-body">
-    <div class="facade-flex-container">
+<body class="index-page">
+    <div class="index-flex-container">
+        <!-- ФОНОВАЯ КАРТИНКА — ВИДНА ЦЕЛИКОМ БЕЗ ОБРЕЗКИ -->
+        <img src="imag/background.jpg" alt="" class="index-bg-img" aria-hidden="true">
         
-        <!-- Flex-контейнер для заголовка -->
-        <div class="facade-title-wrapper">
-            <div class="facade-title">
-                <span class="facade-emoji">⚔️</span>
-                <span class="facade-title-text">БИТВА ПОЛКОВОДЦЕВ</span>
-                <span class="facade-emoji">⚔️</span>
+        <div class="index-title-wrapper">
+            <div class="index-title">
+                <span class="index-emoji">⚔️</span>
+                <span class="index-title-text">БИТВА ПОЛКОВОДЦЕВ</span>
+                <span class="index-emoji">⚔️</span>
             </div>
         </div>
-        
-        <!-- Flex-контейнер для описания -->
-        <div class="facade-description-wrapper">
-            <div class="facade-description">
+        <div class="index-description-wrapper">
+            <div class="index-description">
                 <p>Логическая пошаговая стратегия, где герой нанимает три цветные расы и сражается с противником (ИИ) по принципу «хищник-жертва».</p>
             </div>
         </div>
-        
-        <!-- Flex-контейнер для кнопки -->
-        <div class="facade-btn-wrapper">
-            <button class="facade-btn" id="facadeMenuBtn">🎮 МЕНЮ</button>
+        <div class="index-btn-wrapper">
+            <button class="index-btn" id="facadeMenuBtn">🎮 МЕНЮ</button>
         </div>
-        
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/index.js"></script>
 </body>
 </html>
