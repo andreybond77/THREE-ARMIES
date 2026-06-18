@@ -1,0 +1,300 @@
+/* ============================================================
+   ФАСАДНАЯ СТРАНИЦА — АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ
+   ============================================================ */
+
+.index-page {
+    background: #1a1a2e;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.index-flex-container {
+    position: relative; /* ВАЖНО: необходимо для абсолютного позиционирования дочерних элементов */
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+    background-color: #1a1a2e;
+}
+
+/* ===== ФОНОВАЯ КАРТИНКА ===== */
+.index-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Картинка видна целиком */
+    object-position: center center;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* Затемняющий overlay */
+.index-flex-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ============================================================
+   ЗАГОЛОВОК — ВЕРХНЯЯ ЧАСТЬ ЭКРАНА
+   ============================================================ */
+.index-title-wrapper {
+    position: absolute;
+    top: 25%; /* ⬆️ МЕНЯЙТЕ ЭТО ЗНАЧЕНИЕ: чем больше %, тем ниже заголовок (0% = самый верх, 50% = центр) */
+    left: 50%; /* Центрирование по горизонтали */
+    transform: translateX(-50%); /* Центрирование по горизонтали */
+    z-index: 2;
+    width: 90%; /* Ширина блока (можно менять: 100% = вся ширина, 50% = половина) */
+    max-width: 800px; /* Максимальная ширина на больших экранах */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.index-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 2vw, 15px);
+    flex-wrap: wrap;
+    padding: 0 10px;
+}
+
+.index-title-text {
+    background: linear-gradient(135deg, #ff4444, #4CAF50, #2196F3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: clamp(24px, 6vw, 48px);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.index-emoji {
+    font-size: clamp(24px, 6vw, 48px);
+}
+
+/* ============================================================
+   ОПИСАНИЕ — ЦЕНТР ЭКРАНА
+   ============================================================ */
+.index-description-wrapper {
+    position: absolute;
+    top: 60%; /* ⬆️ МЕНЯЙТЕ ЭТО ЗНАЧЕНИЕ: 50% = центр экрана, 40% = чуть выше центра */
+    left: 50%; /* Центрирование по горизонтали */
+    transform: translate(-50%, -50%); /* Центрирование по обеим осям */
+    z-index: 2;
+    width: 90%;
+    max-width: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.index-description {
+    max-width: 100%;
+    padding: 0 10px;
+    text-align: center;
+}
+
+.index-description p {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(14px, 2.5vw, 18px);
+    line-height: 1.6;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ============================================================
+   КНОПКА — НИЖНЯЯ ЧАСТЬ ЭКРАНА
+   ============================================================ */
+.index-btn-wrapper {
+    position: absolute;
+    bottom: 15%; /* ⬆️ МЕНЯЙТЕ ЭТО ЗНАЧЕНИЕ: чем больше %, тем выше кнопка (0% = самый низ, 50% = центр) */
+    left: 50%; /* Центрирование по горизонтали */
+    transform: translateX(-50%); /* Центрирование по горизонтали */
+    z-index: 2;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.index-btn {
+    background: linear-gradient(135deg, #4CAF50, #2e7d32);
+    border: none;
+    border-radius: 50px;
+    padding: clamp(12px, 2.5vh, 16px) clamp(30px, 6vw, 55px);
+    font-size: clamp(16px, 3vw, 22px);
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+
+.index-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #43a047, #1b5e20);
+}
+
+.index-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ — МОБИЛЬНЫЕ УСТРОЙСТВА
+   ============================================================ */
+@media (max-width: 600px) {
+    /* На мобильных корректируем положение элементов */
+    
+    .index-title-wrapper {
+        top: 12%; /* ⬆️ МЕНЯЙТЕ: положение заголовка на мобильных */
+        width: 95%;
+    }
+    
+    .index-description-wrapper {
+        top: 48%; /* ⬆️ МЕНЯЙТЕ: положение описания на мобильных */
+        width: 95%;
+    }
+    
+    .index-description p {
+        font-size: clamp(12px, 2vw, 14px);
+    }
+    
+    .index-btn-wrapper {
+        bottom: 18%; /* ⬆️ МЕНЯЙТЕ: положение кнопки на мобильных */
+        width: 95%;
+    }
+    
+    .index-btn {
+        padding: 10px 25px;
+        font-size: 16px;
+        white-space: normal;
+        max-width: 90%;
+    }
+    
+    .index-title-text {
+        font-size: clamp(20px, 5vw, 28px);
+    }
+    
+    .index-emoji {
+        font-size: clamp(20px, 5vw, 28px);
+    }
+}
+
+@media (max-width: 360px) {
+    /* На очень маленьких экранах */
+    
+    .index-title-wrapper {
+        top: 10%; /* ⬆️ МЕНЯЙТЕ: положение заголовка на маленьких экранах */
+    }
+    
+    .index-description-wrapper {
+        top: 45%; /* ⬆️ МЕНЯЙТЕ: положение описания на маленьких экранах */
+    }
+    
+    .index-btn-wrapper {
+        bottom: 15%; /* ⬆️ МЕНЯЙТЕ: положение кнопки на маленьких экранах */
+    }
+    
+    .index-title-text {
+        font-size: 18px;
+    }
+    
+    .index-emoji {
+        font-size: 18px;
+    }
+    
+    .index-description p {
+        font-size: 11px;
+    }
+    
+    .index-btn {
+        font-size: 14px;
+        padding: 8px 20px;
+    }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ — БОЛЬШИЕ ЭКРАНЫ
+   ============================================================ */
+@media (min-width: 1920px) {
+    .index-title-wrapper {
+        top: 18%; /* ️ МЕНЯЙТЕ: положение заголовка на больших экранах */
+    }
+    
+    .index-description-wrapper {
+        top: 52%; /* ⬆️ МЕНЯЙТЕ: положение описания на больших экранах */
+    }
+    
+    .index-btn-wrapper {
+        bottom: 22%; /* ⬆️ МЕНЯЙТЕ: положение кнопки на больших экранах */
+    }
+    
+    .index-title-text {
+        font-size: 56px;
+    }
+    
+    .index-emoji {
+        font-size: 56px;
+    }
+    
+    .index-description p {
+        font-size: 20px;
+    }
+    
+    .index-btn {
+        font-size: 24px;
+        padding: 18px 60px;
+    }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ — LANDSCAPE ОРИЕНТАЦИЯ (горизонтальный экран)
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+    /* В горизонтальной ориентации элементы располагаются компактнее */
+    
+    .index-title-wrapper {
+        top: 8%; /* ⬆️ МЕНЯЙТЕ: положение заголовка в landscape */
+    }
+    
+    .index-description-wrapper {
+        top: 50%; /* ⬆️ МЕНЯЙТЕ: положение описания в landscape */
+    }
+    
+    .index-btn-wrapper {
+        bottom: 10%; /* ️ МЕНЯЙТЕ: положение кнопки в landscape */
+    }
+    
+    .index-title-text {
+        font-size: 20px;
+    }
+    
+    .index-emoji {
+        font-size: 20px;
+    }
+    
+    .index-description p {
+        font-size: 12px;
+    }
+}
