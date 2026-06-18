@@ -5,28 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Битва полководцев | Авторизация</title>
     <meta name="description" content="Войдите в аккаунт Яндекс">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/auth.css">
     <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
 </head>
-<body>
-    <div class="container auth-container">
-        <h1>
-            <span class="title-emoji">🔐</span>
-            <span class="title-gradient">АВТОРИЗАЦИЯ</span>
+<body class="auth-page">
+    <div class="auth-container">
+        <h1 class="auth-title">
+            <span class="auth-title-emoji">🔐</span>
+            <span class="auth-title-gradient">АВТОРИЗАЦИЯ</span>
         </h1>
         
         <div class="auth-content">
             <p>Войдите в свой аккаунт Яндекс, чтобы сохранять прогресс и соревноваться с другими игроками.</p>
             
             <div class="auth-buttons">
-                <button class="btn btn-yandex" id="yandexLoginBtn">🔑 ВОЙТИ ЧЕРЕЗ ЯНДЕКС ID</button>
-                <button class="btn btn-guest" id="guestBtn">👤 ПРОДОЛЖИТЬ КАК ГОСТЬ</button>
+                <button class="auth-btn-yandex" id="yandexLoginBtn">🔑 ВОЙТИ ЧЕРЕЗ ЯНДЕКС ID</button>
+                <button class="auth-btn-guest" id="guestBtn">👤 ПРОДОЛЖИТЬ КАК ГОСТЬ</button>
             </div>
         </div>
 
-        <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+        <button class="auth-btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>
