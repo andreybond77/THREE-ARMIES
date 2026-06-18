@@ -5,28 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Битва полководцев | Выбор сложности</title>
     <meta name="description" content="Выбор уровня сложности">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/difficulty.css">
     <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
 </head>
-<body>
-    <div class="container difficulty-container">
-        <h1>
-            <span class="title-emoji">🎯</span>
-            <span class="title-gradient"> СЛОЖНОСТЬ</span>
+<body class="difficulty-page">
+    <div class="difficulty-container">
+        <h1 class="difficulty-title">
+            <span class="difficulty-title-emoji">🎯</span>
+            <span class="difficulty-title-gradient">СЛОЖНОСТЬ</span>
         </h1>
         
-        <div class="difficulty-buttons-page">
-            <button class="difficulty-page-btn easy" data-diff="easy">
-                <div class="difficulty-title">🟢 ЛЁГКАЯ</div>
-                <div class="difficulty-subtitle">Ты только вступаешь на ратный путь</div>
+        <div class="difficulty-buttons">
+            <button class="difficulty-btn difficulty-btn-easy" data-diff="easy">
+                <div class="difficulty-btn-title">🟢 ЛЁГКАЯ</div>
+                <div class="difficulty-btn-subtitle">Ты только вступаешь на ратный путь</div>
             </button>
-            <button class="difficulty-page-btn medium" data-diff="medium">
-                <div class="difficulty-title">🟡 СРЕДНЯЯ</div>
-                <div class="difficulty-subtitle">Ты провёл много битв</div>
+            <button class="difficulty-btn difficulty-btn-medium" data-diff="medium">
+                <div class="difficulty-btn-title">🟡 СРЕДНЯЯ</div>
+                <div class="difficulty-btn-subtitle">Ты провёл много битв</div>
             </button>
-            <button class="difficulty-page-btn hard" data-diff="hard">
-                <div class="difficulty-title">🔴 СЛОЖНАЯ</div>
-                <div class="difficulty-subtitle">Ты — Великий полководец</div>
+            <button class="difficulty-btn difficulty-btn-hard" data-diff="hard">
+                <div class="difficulty-btn-title">🔴 СЛОЖНАЯ</div>
+                <div class="difficulty-btn-subtitle">Ты — Великий полководец</div>
             </button>
         </div>
 
@@ -34,12 +35,13 @@
             <p>Выберите уровень сложности, чтобы увидеть описание...</p>
         </div>
 
-        <div class="button-group">
-            <button class="btn btn-start-game" id="startGameBtn">⚔️ НАЧАТЬ БИТВУ</button>
-            <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+        <div class="difficulty-btn-group">
+            <button class="difficulty-btn-action difficulty-btn-start" id="startGameBtn">⚔️ НАЧАТЬ БИТВУ</button>
+            <button class="difficulty-btn-action difficulty-btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/difficulty.js"></script>
 </body>
 </html>
