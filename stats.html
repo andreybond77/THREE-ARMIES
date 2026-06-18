@@ -5,29 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Битва полководцев | Статистика</title>
     <meta name="description" content="Статистика побед в игре">
-    <link rel="stylesheet" href="style.css">
-    <!-- Yandex Games SDK (временно отключён для локальной разработки) -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/stats.css">
+    <!-- Yandex Games SDK (временно отключён) -->
     <!-- <script src="https://sdk.games.s3.yandex.net/sdk.js"></script> -->
 </head>
-<body>
-    <div class="container stats-container">
-        <h1>
-            <span class="title-emoji">📊</span>
-            <span class="title-gradient">СТАТИСТИКА</span>
+<body class="stats-page">
+    <div class="stats-container">
+        <h1 class="stats-title">
+            <span class="stats-title-emoji">📊</span>
+            <span class="stats-title-gradient">СТАТИСТИКА</span>
         </h1>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="label">👤 ПОБЕД ИГРОКА</div>
-                <div class="value" id="playerWins">0</div>
+            <div class="stats-card">
+                <div class="stats-card-label">👤 ПОБЕД ИГРОКА</div>
+                <div class="stats-card-value" id="playerWins">0</div>
             </div>
-            <div class="stat-card">
-                <div class="label">🤖 ПОБЕД КОМПЬЮТЕРА</div>
-                <div class="value" id="computerWins">0</div>
+            <div class="stats-card">
+                <div class="stats-card-label">🤖 ПОБЕД КОМПЬЮТЕРА</div>
+                <div class="stats-card-value" id="computerWins">0</div>
             </div>
-            <div class="stat-card">
-                <div class="label">🎮 ВСЕГО ИГР</div>
-                <div class="value" id="totalGames">0</div>
+            <div class="stats-card">
+                <div class="stats-card-label">🎮 ВСЕГО ИГР</div>
+                <div class="stats-card-value" id="totalGames">0</div>
             </div>
         </div>
 
@@ -49,16 +50,17 @@
             </table>
         </div>
 
-        <div class="button-group">
-            <button class="btn btn-reset" id="resetStatsBtn">🗑 СБРОСИТЬ СТАТИСТИКУ</button>
-            <button class="btn btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
+        <div class="stats-btn-group">
+            <button class="stats-btn-reset" id="resetStatsBtn">🗑 СБРОСИТЬ СТАТИСТИКУ</button>
+            <button class="stats-btn-back" id="backBtn">🏠 НА ГЛАВНУЮ</button>
         </div>
         
-        <div class="footer">
-            <p class="copyright">© 2024 БИТВА ПОЛКОВОДЦЕВ. Все права защищены.</p>
+        <div class="stats-footer">
+            <p>© 2024 БИТВА ПОЛКОВОДЦЕВ. Все права защищены.</p>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/stats.js"></script>
 </body>
 </html>
