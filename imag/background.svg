@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- Фон -->
+    <rect width="512" height="512" rx="100" fill="#1a1a2e"/>
+    
+    <!-- Игровая доска (фрагмент 6×6) -->
+    <g transform="translate(76, 76)">
+        <!-- Клетки -->
+        <rect x="0" y="0" width="60" height="60" fill="#8B4513"/>
+        <rect x="60" y="0" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="120" y="0" width="60" height="60" fill="#8B4513"/>
+        <rect x="180" y="0" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="240" y="0" width="60" height="60" fill="#8B4513"/>
+        <rect x="300" y="0" width="60" height="60" fill="#F0D9B5"/>
+        
+        <rect x="0" y="60" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="60" y="60" width="60" height="60" fill="#8B4513"/>
+        <rect x="120" y="60" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="180" y="60" width="60" height="60" fill="#8B4513"/>
+        <rect x="240" y="60" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="300" y="60" width="60" height="60" fill="#8B4513"/>
+        
+        <rect x="0" y="120" width="60" height="60" fill="#8B4513"/>
+        <rect x="60" y="120" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="120" y="120" width="60" height="60" fill="#8B4513"/>
+        <rect x="180" y="120" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="240" y="120" width="60" height="60" fill="#8B4513"/>
+        <rect x="300" y="120" width="60" height="60" fill="#F0D9B5"/>
+        
+        <rect x="0" y="180" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="60" y="180" width="60" height="60" fill="#8B4513"/>
+        <rect x="120" y="180" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="180" y="180" width="60" height="60" fill="#8B4513"/>
+        <rect x="240" y="180" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="300" y="180" width="60" height="60" fill="#8B4513"/>
+        
+        <rect x="0" y="240" width="60" height="60" fill="#8B4513"/>
+        <rect x="60" y="240" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="120" y="240" width="60" height="60" fill="#8B4513"/>
+        <rect x="180" y="240" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="240" y="240" width="60" height="60" fill="#8B4513"/>
+        <rect x="300" y="240" width="60" height="60" fill="#F0D9B5"/>
+        
+        <rect x="0" y="300" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="60" y="300" width="60" height="60" fill="#8B4513"/>
+        <rect x="120" y="300" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="180" y="300" width="60" height="60" fill="#8B4513"/>
+        <rect x="240" y="300" width="60" height="60" fill="#F0D9B5"/>
+        <rect x="300" y="300" width="60" height="60" fill="#8B4513"/>
+        
+        <!-- Шашка 1 (Красная) на клетке (1,0) -->
+        <circle cx="90" cy="30" r="24" fill="#ffffff" stroke="#999" stroke-width="2"/>
+        <circle cx="90" cy="30" r="14" fill="#ff4444"/>
+        
+        <!-- Шашка 2 (Зелёная) на клетке (4,2) -->
+        <circle cx="270" cy="150" r="24" fill="#222222" stroke="#555" stroke-width="2"/>
+        <circle cx="270" cy="150" r="14" fill="#4CAF50"/>
+        
+        <!-- Шашка 3 (Синяя) на клетке (2,4) -->
+        <circle cx="150" cy="270" r="24" fill="#ffffff" stroke="#999" stroke-width="2"/>
+        <circle cx="150" cy="270" r="14" fill="#2196F3"/>
+        
+        <!-- Рамка доски -->
+        <rect x="0" y="0" width="360" height="360" fill="none" stroke="#FFD700" stroke-width="3"/>
+    </g>
+    
+    <!-- Тень доски -->
+    <rect x="86" y="86" width="360" height="360" rx="10" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="10" opacity="0.3"/>
+</svg>
