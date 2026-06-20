@@ -12,7 +12,7 @@
 }
 
 .index-flex-container {
-    position: relative; /* ВАЖНО: необходимо для абсолютного позиционирования дочерних элементов */
+    position: relative;
     width: 100%;
     min-height: 100vh;
     box-sizing: border-box;
@@ -27,7 +27,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Картинка видна целиком */
+    object-fit: contain;
     object-position: center center;
     z-index: 0;
     pointer-events: none;
@@ -53,12 +53,12 @@
    ============================================================ */
 .index-title-wrapper {
     position: absolute;
-    top: 25%; /* ⬆️ МЕНЯЙТЕ ЭТО ЗНАЧЕНИЕ: чем больше %, тем ниже заголовок (0% = самый верх, 50% = центр) */
-    left: 50%; /* Центрирование по горизонтали */
-    transform: translateX(-50%); /* Центрирование по горизонтали */
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
-    width: 90%; /* Ширина блока (можно менять: 100% = вся ширина, 50% = половина) */
-    max-width: 800px; /* Максимальная ширина на больших экранах */
+    width: 90%;
+    max-width: 800px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -94,9 +94,9 @@
    ============================================================ */
 .index-description-wrapper {
     position: absolute;
-    top: 60%; /* ⬆️ МЕНЯЙТЕ ЭТО ЗНАЧЕНИЕ: 50% = центр экрана, 40% = чуть выше центра */
-    left: 50%; /* Центрирование по горизонтали */
-    transform: translate(-50%, -50%); /* Центрирование по обеим осям */
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 2;
     width: 90%;
     max-width: 700px;
@@ -124,9 +124,9 @@
    ============================================================ */
 .index-btn-wrapper {
     position: absolute;
-    bottom: 15%; /* ⬆️ МЕНЯЙТЕ ЭТО ЗНАЧЕНИЕ: чем больше %, тем выше кнопка (0% = самый низ, 50% = центр) */
-    left: 50%; /* Центрирование по горизонтали */
-    transform: translateX(-50%); /* Центрирование по горизонтали */
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
     width: 90%;
     max-width: 400px;
@@ -161,73 +161,164 @@
 }
 
 /* ============================================================
+   ЭКРАН ЗАГРУЗКИ
+   ============================================================ */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #4CAF50;
+    border-right-color: #ff4444;
+    border-bottom-color: #2196F3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.loading-text {
+    background: linear-gradient(135deg, #ff4444, #4CAF50, #2196F3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: clamp(20px, 5vw, 32px);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.loading-emoji {
+    font-size: clamp(20px, 5vw, 32px);
+}
+
+.loading-status {
+    color: #ccc;
+    font-size: 14px;
+    margin: 0;
+}
+
+.loading-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loading-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #ff9800);
+    transition: width 0.3s ease;
+    border-radius: 2px;
+    animation: loadingProgress 1.5s ease-out forwards;
+}
+
+@keyframes loadingProgress {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* ============================================================
    АДАПТИВНОСТЬ — МОБИЛЬНЫЕ УСТРОЙСТВА
    ============================================================ */
 @media (max-width: 600px) {
-    /* На мобильных корректируем положение элементов */
-    
     .index-title-wrapper {
-        top: 12%; /* ⬆️ МЕНЯЙТЕ: положение заголовка на мобильных */
+        top: 12%;
         width: 95%;
     }
-    
     .index-description-wrapper {
-        top: 48%; /* ⬆️ МЕНЯЙТЕ: положение описания на мобильных */
+        top: 48%;
         width: 95%;
     }
-    
     .index-description p {
         font-size: clamp(12px, 2vw, 14px);
     }
-    
     .index-btn-wrapper {
-        bottom: 18%; /* ⬆️ МЕНЯЙТЕ: положение кнопки на мобильных */
+        bottom: 18%;
         width: 95%;
     }
-    
     .index-btn {
         padding: 10px 25px;
         font-size: 16px;
         white-space: normal;
         max-width: 90%;
     }
-    
     .index-title-text {
         font-size: clamp(20px, 5vw, 28px);
     }
-    
     .index-emoji {
         font-size: clamp(20px, 5vw, 28px);
+    }
+    
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+    }
+    .loading-text {
+        font-size: 18px;
+    }
+    .loading-progress {
+        width: 150px;
     }
 }
 
 @media (max-width: 360px) {
-    /* На очень маленьких экранах */
-    
     .index-title-wrapper {
-        top: 10%; /* ⬆️ МЕНЯЙТЕ: положение заголовка на маленьких экранах */
+        top: 10%;
     }
-    
     .index-description-wrapper {
-        top: 45%; /* ⬆️ МЕНЯЙТЕ: положение описания на маленьких экранах */
+        top: 45%;
     }
-    
     .index-btn-wrapper {
-        bottom: 15%; /* ⬆️ МЕНЯЙТЕ: положение кнопки на маленьких экранах */
+        bottom: 15%;
     }
-    
     .index-title-text {
         font-size: 18px;
     }
-    
     .index-emoji {
         font-size: 18px;
     }
-    
     .index-description p {
         font-size: 11px;
     }
-    
     .index-btn {
         font-size: 14px;
         padding: 8px 20px;
@@ -239,29 +330,23 @@
    ============================================================ */
 @media (min-width: 1920px) {
     .index-title-wrapper {
-        top: 18%; /* ️ МЕНЯЙТЕ: положение заголовка на больших экранах */
+        top: 18%;
     }
-    
     .index-description-wrapper {
-        top: 52%; /* ⬆️ МЕНЯЙТЕ: положение описания на больших экранах */
+        top: 52%;
     }
-    
     .index-btn-wrapper {
-        bottom: 22%; /* ⬆️ МЕНЯЙТЕ: положение кнопки на больших экранах */
+        bottom: 22%;
     }
-    
     .index-title-text {
         font-size: 56px;
     }
-    
     .index-emoji {
         font-size: 56px;
     }
-    
     .index-description p {
         font-size: 20px;
     }
-    
     .index-btn {
         font-size: 24px;
         padding: 18px 60px;
@@ -269,31 +354,24 @@
 }
 
 /* ============================================================
-   АДАПТИВНОСТЬ — LANDSCAPE ОРИЕНТАЦИЯ (горизонтальный экран)
+   АДАПТИВНОСТЬ — LANDSCAPE ОРИЕНТАЦИЯ
    ============================================================ */
 @media (max-height: 500px) and (orientation: landscape) {
-    /* В горизонтальной ориентации элементы располагаются компактнее */
-    
     .index-title-wrapper {
-        top: 8%; /* ⬆️ МЕНЯЙТЕ: положение заголовка в landscape */
+        top: 8%;
     }
-    
     .index-description-wrapper {
-        top: 50%; /* ⬆️ МЕНЯЙТЕ: положение описания в landscape */
+        top: 50%;
     }
-    
     .index-btn-wrapper {
-        bottom: 10%; /* ️ МЕНЯЙТЕ: положение кнопки в landscape */
+        bottom: 10%;
     }
-    
     .index-title-text {
         font-size: 20px;
     }
-    
     .index-emoji {
         font-size: 20px;
     }
-    
     .index-description p {
         font-size: 12px;
     }

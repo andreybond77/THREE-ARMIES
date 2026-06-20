@@ -198,3 +198,27 @@
         font-size: 18px;
     }
 }
+/* ===== БАННЕРНАЯ РЕКЛАМА ===== */
+.banner-ad-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: 50px;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 2px solid #ff9800;
+}
+
+.banner-ad-container:empty {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .banner-ad-container {
+        min-height: 40px;
+    }
+}

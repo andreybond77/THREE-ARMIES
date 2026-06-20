@@ -111,6 +111,22 @@ body {
     background: #e53935;
 }
 
+.fullscreen-btn {
+    background: #9C27B0;
+}
+
+.fullscreen-btn:hover {
+    background: #7B1FA2;
+}
+
+.fullscreen-btn.active {
+    background: #4CAF50;
+}
+
+.fullscreen-btn:active {
+    transform: scale(0.95);
+}
+
 .score {
     display: flex;
     justify-content: center;
@@ -309,6 +325,60 @@ body {
     border-radius: 14px;
 }
 
+/* ===== КНОПКИ ДЕЙСТВИЙ (РЕКЛАМА, ШАРИНГ) ===== */
+.game-actions {
+    display: flex;
+    gap: 10px;
+    padding: 10px 10px 0 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    flex: 1;
+    min-width: 100px;
+    max-width: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.action-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.action-btn.rewarded-btn {
+    background: linear-gradient(135deg, #ff9800, #e65100);
+}
+
+.action-btn.rewarded-btn:hover {
+    background: linear-gradient(135deg, #ffb300, #f57c00);
+}
+
+.action-btn.share-btn {
+    background: linear-gradient(135deg, #2196F3, #0d47a1);
+}
+
+.action-btn.share-btn:hover {
+    background: linear-gradient(135deg, #42a5f5, #1565c0);
+}
+
+/* ===== МОБИЛЬНЫЕ (ДОПОЛНЕНО) ===== */
 @media (max-width: 1024px) and (min-width: 481px) {
     .game { max-width: 450px; }
 }
@@ -330,6 +400,18 @@ body {
     .game-info-turn { font-size: 11px; padding: 4px 8px; }
     .game-info-msg { font-size: 11px; min-height: 18px; }
     .color-btn, .medium-piece { width: 40px; height: 40px; font-size: 18px; }
+    
+    /* Кнопки действий на мобильных */
+    .game-actions {
+        padding: 8px 8px 0 8px;
+        gap: 8px;
+    }
+    .action-btn {
+        font-size: 12px;
+        padding: 8px 12px;
+        min-width: 80px;
+        max-width: 180px;
+    }
 }
 
 @media (max-width: 360px) {
@@ -347,6 +429,20 @@ body {
     .game-info-msg { font-size: 10px; min-height: 16px; }
     .placement-panel { padding: 0 6px; }
     .color-btn, .medium-piece { width: 36px; height: 36px; font-size: 16px; }
+    
+    /* Кнопки действий на очень маленьких */
+    .game-actions {
+        flex-direction: column;
+        align-items: center;
+        padding: 6px 6px 0 6px;
+        gap: 6px;
+    }
+    .action-btn {
+        font-size: 11px;
+        padding: 7px 12px;
+        min-width: 100%;
+        max-width: 100%;
+    }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
@@ -360,6 +456,8 @@ body {
     .game-info { padding: 4px 8px; margin: 6px 8px 0 8px; gap: 3px; }
     .game-info-turn { font-size: 10px; padding: 3px 8px; }
     .game-info-msg { font-size: 10px; min-height: 14px; }
+    .game-actions { padding: 6px 8px 0 8px; }
+    .action-btn { font-size: 11px; padding: 6px 10px; min-width: 70px; max-width: 150px; }
 }
 
 @media (min-width: 1200px) {
@@ -369,4 +467,5 @@ body {
     .game-info { padding: 12px 16px; gap: 8px; }
     .game-info-turn { font-size: 14px; }
     .game-info-msg { font-size: 14px; }
+    .action-btn { font-size: 15px; padding: 12px 20px; min-width: 120px; max-width: 250px; }
 }
