@@ -89,35 +89,7 @@
     font-size: clamp(24px, 6vw, 48px);
 }
 
-/* ============================================================
-   ОПИСАНИЕ — ЦЕНТР ЭКРАНА
-   ============================================================ */
-.index-description-wrapper {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    width: 90%;
-    max-width: 700px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
-.index-description {
-    max-width: 100%;
-    padding: 0 10px;
-    text-align: center;
-}
-
-.index-description p {
-    margin: 0;
-    color: #ffffff;
-    font-size: clamp(14px, 2.5vw, 18px);
-    line-height: 1.6;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-}
 
 /* ============================================================
    КНОПКА — НИЖНЯЯ ЧАСТЬ ЭКРАНА
