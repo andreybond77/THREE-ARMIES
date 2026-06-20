@@ -10,19 +10,21 @@
 <body>
     <div class="game">
         <div class="header">
-            <h1><span class="title-emoji">️</span>
-                <span class="title-gradient">ПОЛЕ БОЯ</span>
+            <h1>
                 <span class="title-emoji">⚔️</span>
-           </h1>
+                <span class="title-gradient">ПОЛЕ БОЯ</span>
+                <span class="title-emoji">️⚔️</span>
+            </h1>
             <div class="header-controls">
                 <button class="icon-btn sound-btn" id="soundBtn" aria-label="Включить/выключить звук">🔊</button>
+                <button class="icon-btn fullscreen-btn" id="fullscreenBtn" aria-label="Полноэкранный режим">🖥️</button>
                 <button class="icon-btn exit-btn" id="exitBtn" aria-label="Выйти в меню">✕</button>
             </div>
         </div>
 
         <div class="score">
             <div class="score-item">
-                <span class="lbl">👤 ИГРОК</span>
+                <span class="lbl"> ИГРОК</span>
                 <span class="val" id="playerScore">0</span>
             </div>
             <div class="diff-badge" id="difficultyBadge">⏳ ЗАГРУЗКА...</div>
@@ -48,9 +50,20 @@
             <div class="game-info-turn" id="turnIndicator">⚡ ХОДИТ: ИГРОК</div>
             <div class="game-info-msg" id="gameMessage">🎮 Ваш ход. Выберите шашку</div>
         </div>
+
+        <!-- ===== КНОПКИ РЕКЛАМЫ И ШАРИНГА ===== -->
+        <div class="game-actions">
+            <button class="action-btn rewarded-btn" id="rewardedBtn">
+                🎁 +3 ОЧКА ЗА РЕКЛАМУ
+            </button>
+            <button class="action-btn share-btn" id="shareBtn">
+                📤 ПОДЕЛИТЬСЯ
+            </button>
+        </div>
     </div>
 
     <script src="js/common.js"></script>
+    <script src="js/yandex.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html>

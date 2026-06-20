@@ -5,13 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Битва полководцев | Добро пожаловать</title>
     <meta name="description" content="Логическая пошаговая стратегия с тремя расами">
+    
+    <!-- ===== FAVICON ===== -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- ===== OPEN GRAPH ===== -->
+    <meta property="og:title" content="Битва полководцев">
+    <meta property="og:description" content="Логическая пошаговая стратегия, где герой нанимает три цветные расы и сражается с противником (ИИ) по принципу «хищник-жертва».">
+    <meta property="og:image" content="https://ваш-сайт/og-image.jpg">
+    <meta property="og:url" content="https://ваш-сайт/">
+    <meta property="og:type" content="game">
+    <meta property="og:site_name" content="Битва полководцев">
+    
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Битва полководцев">
+    <meta name="twitter:description" content="Логическая пошаговая стратегия с тремя армиями">
+    
+    <!-- ===== PWA MANIFEST ===== -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- ===== STYLES ===== -->
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/index.css">
+    
+    <!-- ===== YANDEX SDK ===== -->
     <script async src="https://sdk.games.s3.yandex.net/sdk.js" onload="initSDK()"></script>
 </head>
 <body class="index-page">
+    <!-- ===== ЭКРАН ЗАГРУЗКИ ===== -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-title">
+                <span class="loading-emoji">⚔️</span>
+                <span class="loading-text">БИТВА ПОЛКОВОДЦЕВ</span>
+                <span class="loading-emoji">⚔️</span>
+            </div>
+            <p class="loading-status">Загрузка игры...</p>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="index-flex-container">
-        <!-- ФОНОВАЯ КАРТИНКА — ВИДНА ЦЕЛИКОМ БЕЗ ОБРЕЗКИ -->
+        <!-- ФОНОВАЯ КАРТИНКА -->
         <img src="imag/background.jpg" alt="" class="index-bg-img" aria-hidden="true">
         
         <div class="index-title-wrapper">
