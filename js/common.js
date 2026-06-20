@@ -8,18 +8,24 @@ let playerName = 'ИГРОК';
 let currentLanguage = 'ru';
 let sdkInitialized = false;
 
-// ===== SDK =====
+// ============================================================
+// 1. SDK
+// ============================================================
+
 async function initSDK() {
     try {
         if (typeof YaGames !== 'undefined') {
             ysdk = await YaGames.init();
             sdkInitialized = true;
             console.log('✅ SDK Яндекс Игр инициализирован');
+            
             await detectLanguage();
+            
             if (ysdk.features && ysdk.features.LoadingAPI) {
                 ysdk.features.LoadingAPI.ready();
                 console.log('✅ LoadingAPI.ready() вызван');
             }
+            
             if (ysdk.on) {
                 ysdk.on('pause', () => {
                     console.log('Игра на паузе');
@@ -36,14 +42,30 @@ async function initSDK() {
                     }
                 });
             }
+            
+            // Синхронизация данных после инициализации
+            if (typeof syncAllGameData === 'function') {
+                setTimeout(() => syncAllGameData(), 500);
+            }
+            
             return true;
         } else {
             console.warn('⚠️ SDK Яндекс Игр не загружен (локальный режим)');
+            showSDKFallback();
             return false;
         }
     } catch (error) {
-        console.error('Ошибка инициализации SDK:', error);
+        console.error('❌ Ошибка инициализации SDK:', error);
+        showSDKFallback();
         return false;
+    }
+}
+
+function showSDKFallback() {
+    const msg = document.getElementById('gameMessage');
+    if (msg) {
+        msg.textContent = 'ℹ️ Игра работает в локальном режиме. Войдите в аккаунт для сохранения прогресса.';
+        msg.style.color = '#ff9800';
     }
 }
 
@@ -61,7 +83,10 @@ async function detectLanguage() {
 }
 
 async function loginToYa() {
-    if (!ysdk) return;
+    if (!ysdk) {
+        alert('SDK не инициализирован. Проверьте подключение к интернету.');
+        return;
+    }
     try {
         const player = await ysdk.getPlayer({ scopes: true });
         isAuthenticated = true;
@@ -70,12 +95,15 @@ async function loginToYa() {
         alert(`Добро пожаловать, ${playerName}!`);
         window.location.href = 'start.html';
     } catch (error) {
-        console.error('Ошибка авторизации:', error);
-        alert('Не удалось войти в аккаунт');
+        console.error('❌ Ошибка авторизации:', error);
+        alert('Не удалось войти в аккаунт. Попробуйте позже.');
     }
 }
 
-// ===== СТАТИСТИКА =====
+// ============================================================
+// 2. СТАТИСТИКА
+// ============================================================
+
 const DEFAULT_STATS = {
     easy: { player: 0, computer: 0, games: 0 },
     medium: { player: 0, computer: 0, games: 0 },
@@ -101,25 +129,63 @@ function saveGameResult(difficulty, winner) {
     stats.total.games++;
     stats.total[winner]++;
     saveStats(stats);
+    
+    // Сохраняем на сервер (если есть функция)
+    if (typeof savePlayerData === 'function') {
+        savePlayerData(stats);
+    }
 }
 
 function renderStats() {
     const s = loadStats();
-    document.getElementById('playerWins').textContent = s.total.player;
-    document.getElementById('computerWins').textContent = s.total.computer;
-    document.getElementById('totalGames').textContent = s.total.games;
-    document.getElementById('easyPlayer').textContent = s.easy.player;
-    document.getElementById('easyComputer').textContent = s.easy.computer;
-    document.getElementById('easyTotal').textContent = s.easy.games;
-    document.getElementById('mediumPlayer').textContent = s.medium.player;
-    document.getElementById('mediumComputer').textContent = s.medium.computer;
-    document.getElementById('mediumTotal').textContent = s.medium.games;
-    document.getElementById('hardPlayer').textContent = s.hard.player;
-    document.getElementById('hardComputer').textContent = s.hard.computer;
-    document.getElementById('hardTotal').textContent = s.hard.games;
+    const elements = {
+        playerWins: 'playerWins',
+        computerWins: 'computerWins',
+        totalGames: 'totalGames',
+        easyPlayer: 'easyPlayer',
+        easyComputer: 'easyComputer',
+        easyTotal: 'easyTotal',
+        mediumPlayer: 'mediumPlayer',
+        mediumComputer: 'mediumComputer',
+        mediumTotal: 'mediumTotal',
+        hardPlayer: 'hardPlayer',
+        hardComputer: 'hardComputer',
+        hardTotal: 'hardTotal'
+    };
+    
+    for (const [key, id] of Object.entries(elements)) {
+        const el = document.getElementById(id);
+        if (el) {
+            const parts = key.match(/(easy|medium|hard|total)?(Player|Computer|Games)?/);
+            if (parts) {
+                if (key === 'playerWins') el.textContent = s.total.player;
+                else if (key === 'computerWins') el.textContent = s.total.computer;
+                else if (key === 'totalGames') el.textContent = s.total.games;
+                else if (key.startsWith('easy')) {
+                    const type = key.replace('easy', '').toLowerCase();
+                    if (type === 'player') el.textContent = s.easy.player;
+                    else if (type === 'computer') el.textContent = s.easy.computer;
+                    else if (type === 'total') el.textContent = s.easy.games;
+                } else if (key.startsWith('medium')) {
+                    const type = key.replace('medium', '').toLowerCase();
+                    if (type === 'player') el.textContent = s.medium.player;
+                    else if (type === 'computer') el.textContent = s.medium.computer;
+                    else if (type === 'total') el.textContent = s.medium.games;
+                } else if (key.startsWith('hard')) {
+                    const type = key.replace('hard', '').toLowerCase();
+                    if (type === 'player') el.textContent = s.hard.player;
+                    else if (type === 'computer') el.textContent = s.hard.computer;
+                    else if (type === 'total') el.textContent = s.hard.games;
+                }
+            }
+        }
+    }
 }
 
-// ===== ОБНОВЛЕНИЕ БЕЙДЖИКА СЛОЖНОСТИ (для game.html) =====
+// ============================================================
+// 3. ОБНОВЛЕНИЕ БЕЙДЖИКА СЛОЖНОСТИ
+// ============================================================
+
 function updateDifficultyBadge() {
     const difficulty = localStorage.getItem('tripleColorDifficulty') || 'easy';
     const badges = {
@@ -132,5 +198,19 @@ function updateDifficultyBadge() {
     if (badge) {
         badge.textContent = badges[difficulty] || '🟢 ЛЁГКАЯ';
         badge.classList.remove('loading');
+    }
+}
+
+// ============================================================
+// 4. ДОПОЛНЕНИЯ ДЛЯ YANDEX.GAMES
+// ============================================================
+
+function saveGameResultWithLeaderboard(difficulty, winner, score) {
+    saveGameResult(difficulty, winner);
+    
+    if (winner === 'player' && score > 0 && typeof saveScoreToLeaderboard === 'function') {
+        const leaderboardScore = Math.round(score * 10 + 
+            (difficulty === 'hard' ? 50 : difficulty === 'medium' ? 25 : 0));
+        saveScoreToLeaderboard(leaderboardScore, { difficulty: difficulty });
     }
 }

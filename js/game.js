@@ -1,3 +1,7 @@
+// ============================================================
+// БИТВА ПОЛКОВОДЦЕВ — ИГРОВАЯ ЛОГИКА
+// ============================================================
+
 // ===== ЧИТАЕМ СЛОЖНОСТЬ =====
 const savedDifficulty = localStorage.getItem('tripleColorDifficulty') || 'medium';
 const DIFFICULTY_LABELS = {
@@ -36,12 +40,22 @@ let placementColors = [];
 let computerBoardBackup = null;
 let difficulty = savedDifficulty;
 let isAnimating = false;
+let isGameOver = false;
 
 const COLORS = ['red', 'green', 'blue'];
 const EMOJI = { red: '🔴', green: '🟢', blue: '🔵' };
 const PREDATOR = { red: 'green', green: 'blue', blue: 'red' };
 
-// ===== ЗВУКИ (Web Audio API) =====
+// Цветовая карта для отрисовки шашек
+const COLOR_MAP = {
+    red: '#e53935',
+    green: '#43a047',
+    blue: '#1e88e5'
+};
+
+// ============================================================
+// ЗВУКИ (Web Audio API)
+// ============================================================
 let audioCtx = null;
 let soundEnabled = true;
 
@@ -111,7 +125,6 @@ function toggleSound() {
     }
 }
 
-// Загрузка состояния звука
 (function loadSoundState() {
     const saved = localStorage.getItem('tripleColorSound');
     if (saved === '0') {
@@ -124,7 +137,42 @@ function toggleSound() {
     }
 })();
 
-// ===== ДОСКА =====
+// ============================================================
+// HAPTIC FEEDBACK (ВИБРАЦИЯ)
+// ============================================================
+async function hapticFeedback(type = 'light') {
+    if (typeof ysdk !== 'undefined' && ysdk && ysdk.hapticFeedback) {
+        try {
+            const impactTypes = {
+                'light': 'light',
+                'medium': 'medium',
+                'heavy': 'heavy',
+                'success': 'success',
+                'error': 'error',
+                'warning': 'warning'
+            };
+            await ysdk.hapticFeedback.impactOccurred(impactTypes[type] || 'light');
+            return;
+        } catch (e) {
+            // Fallback
+        }
+    }
+    if ('vibrate' in navigator) {
+        const patterns = {
+            'light': [10],
+            'medium': [20],
+            'heavy': [40],
+            'success': [50, 30, 50],
+            'error': [100, 50, 100],
+            'warning': [30, 20, 30]
+        };
+        navigator.vibrate(patterns[type] || [10]);
+    }
+}
+
+// ============================================================
+// ДОСКА
+// ============================================================
 function initBoard() {
     board = [];
     for (let i = 0; i < 8; i++) {
@@ -159,9 +207,12 @@ function getColorName(color) {
     return color === 'red' ? '🔴 КРАСНАЯ' : (color === 'green' ? '🟢 ЗЕЛЁНАЯ' : '🔵 СИНЯЯ');
 }
 
-// ===== UI =====
+// ============================================================
+// UI
+// ============================================================
 function showMessage(msg, color) {
     const el = document.getElementById('gameMessage');
+    if (!el) return;
     el.textContent = msg;
     el.classList.remove('success', 'error', 'info', 'warning');
     if (color === '#4CAF50') el.classList.add('success');
@@ -175,8 +226,12 @@ function updateUI() {
     document.getElementById('playerScore').textContent = playerScore;
     document.getElementById('computerScore').textContent = computerScore;
     const turnEl = document.getElementById('turnIndicator');
+    if (!turnEl) return;
     turnEl.classList.remove('computer-turn', 'game-over');
-    if (currentPlayer === 0) {
+    if (isGameOver) {
+        turnEl.textContent = '🏁 ИГРА ОКОНЧЕНА';
+        turnEl.classList.add('game-over');
+    } else if (currentPlayer === 0) {
         turnEl.textContent = '⚡ ХОДИТ: ИГРОК';
     } else {
         turnEl.textContent = '🤖 ХОДИТ: КОМПЬЮТЕР';
@@ -186,9 +241,22 @@ function updateUI() {
     document.getElementById('difficultyBadge').textContent = badges[difficulty] || '🟡 СРЕДНЯЯ';
 }
 
-// ===== ОТРИСОВКА =====
+// ============================================================
+// ОТРИСОВКА ШАШЕК (ЦВЕТНЫЕ КРУГИ ВМЕСТО ЭМОДЗИ)
+// ============================================================
+function lightenColor(color, percent) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.min(255, (num >> 16) + amt);
+    const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+    const B = Math.min(255, (num & 0x0000FF) + amt);
+    return `rgb(${R}, ${G}, ${B})`;
+}
+
 function drawPieceAt(x, y, piece, cell) {
     const radius = cell / 2 - 4;
+    
+    // 1. Основа шашки (белая для игрока, тёмная для компьютера)
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = piece.player === 0 ? '#ffffff' : '#222222';
@@ -196,24 +264,43 @@ function drawPieceAt(x, y, piece, cell) {
     ctx.strokeStyle = piece.player === 0 ? '#999' : '#555';
     ctx.lineWidth = Math.max(1.5, cell / 40);
     ctx.stroke();
-    const emojiSize = Math.max(radius - 3, 12);
-    ctx.font = `${emojiSize}px "Segoe UI Emoji", "Segoe UI", sans-serif`;
-    ctx.fillStyle = '#333';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(EMOJI[piece.color], x, y);
+    
+    // 2. Цветной круг внутри шашки
+    const color = COLOR_MAP[piece.color] || '#888';
+    const innerRadius = radius * 0.55;
+    
+    const gradient = ctx.createRadialGradient(
+        x - innerRadius * 0.3, y - innerRadius * 0.3, innerRadius * 0.2,
+        x, y, innerRadius
+    );
+    gradient.addColorStop(0, lightenColor(color, 40));
+    gradient.addColorStop(1, color);
+    
+    ctx.beginPath();
+    ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = Math.max(1, cell / 60);
+    ctx.stroke();
 }
 
+// ============================================================
+// ОТРИСОВКА ДОСКИ
+// ============================================================
 function draw() {
     if (canvas.width === 0 || canvas.height === 0) return;
     const cell = canvas.width / 8;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    
+    // Доска
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             const isDark = (row + col) % 2 === 1;
             ctx.fillStyle = isDark ? '#8B4513' : '#F0D9B5';
             ctx.fillRect(col * cell, row * cell, cell, cell);
+            
             const piece = board[row][col];
             if (piece) {
                 const x = col * cell + cell / 2;
@@ -222,7 +309,8 @@ function draw() {
             }
         }
     }
-
+    
+    // Подсветка выбранной шашки
     if (selectedPiece) {
         const x = selectedPiece.col * cell;
         const y = selectedPiece.row * cell;
@@ -230,13 +318,14 @@ function draw() {
         ctx.lineWidth = Math.max(3, cell / 20);
         ctx.strokeRect(x + 2, y + 2, cell - 4, cell - 4);
     }
-
+    
+    // Подсветка валидных ходов
     if (selectedPiece && validMoves.length > 0) {
         for (const move of validMoves) {
             const x = move.col * cell + cell / 2;
             const y = move.row * cell + cell / 2;
             const radius = cell / 4;
-
+            
             if (move.type === 'capture') {
                 ctx.beginPath();
                 ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
@@ -257,7 +346,8 @@ function draw() {
             }
         }
     }
-
+    
+    // Подсветка при расстановке
     if (waitingForPlacement && difficulty !== 'medium') {
         for (let row = 5; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
@@ -270,22 +360,22 @@ function draw() {
     }
 }
 
-// ===== ПРАВИЛА ХОДОВ =====
+// ============================================================
+// ПРАВИЛА ХОДОВ
+// ============================================================
 function isValidMove(piece, fromRow, fromCol, toRow, toCol) {
     const target = board[toRow][toCol];
     const dx = toCol - fromCol;
     const dy = toRow - fromRow;
     const isMove = (Math.abs(dx) + Math.abs(dy) === 1) && (dx === 0 || dy === 0);
     const isCapture = (Math.abs(dx) === 1 && Math.abs(dy) === 1);
-
+    
     if (isMove && target === null) return { valid: true, type: 'move' };
-
+    
     if (isCapture && target && target.player === 1) {
-        // Захват: хищник vs жертва (разные цвета)
         if (PREDATOR[piece.color] === target.color) {
             return { valid: true, type: 'capture', target };
         }
-        // Обмен: одинаковые цвета (нейтральные) — просто меняются местами
         if (piece.color === target.color) {
             return { valid: true, type: 'swap', target };
         }
@@ -312,7 +402,9 @@ function calculateValidMoves(row, col) {
     return moves;
 }
 
-// ===== АНИМАЦИЯ ХОДА =====
+// ============================================================
+// АНИМАЦИЯ ХОДА
+// ============================================================
 function animateMove(fromRow, fromCol, toRow, toCol, piece, callback) {
     isAnimating = true;
     const cell = canvas.width / 8;
@@ -322,17 +414,17 @@ function animateMove(fromRow, fromCol, toRow, toCol, piece, callback) {
     const endY = toRow * cell + cell / 2;
     const duration = 220;
     const startTime = performance.now();
-
+    
     function frame(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const easeProgress = 1 - Math.pow(1 - progress, 3);
         const currentX = startX + (endX - startX) * easeProgress;
         const currentY = startY + (endY - startY) * easeProgress;
-
+        
         draw();
         drawPieceAt(currentX, currentY, piece, cell);
-
+        
         if (progress < 1) {
             requestAnimationFrame(frame);
         } else {
@@ -343,50 +435,50 @@ function animateMove(fromRow, fromCol, toRow, toCol, piece, callback) {
     requestAnimationFrame(frame);
 }
 
-// ===== ВЫПОЛНЕНИЕ ХОДА С АНИМАЦИЕЙ =====
+// ===== ВЫПОЛНЕНИЕ ХОДА С АНИМАЦИЕЙ И HAPTIC =====
 function makeMoveAnimated(fromRow, fromCol, toRow, toCol, moveInfo) {
     const piece = board[fromRow][fromCol];
     selectedPiece = null;
     validMoves = [];
-
-    // Временно убираем шашку для анимации
+    
     board[fromRow][fromCol] = null;
-
+    
     animateMove(fromRow, fromCol, toRow, toCol, piece, () => {
         if (moveInfo.type === 'capture') {
-            // ЗАХВАТ: шашка игрока встаёт на место врага
             board[toRow][toCol] = piece;
             playerScore++;
             sounds.capture();
+            
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('heavy');
+            }
+            
             updateUI();
             showMessage(`+1 очко! Съедена ${getColorName(moveInfo.target.color)} шашка`, '#4CAF50');
         } else if (moveInfo.type === 'swap') {
-            // ===== ОБМЕН МЕСТАМИ (SWAP) =====
-            // Получаем шашку противника с целевой клетки
             const targetPiece = board[toRow][toCol];
-
-            // Меняем местами, СОХРАНЯЯ все свойства (цвет и принадлежность)
-            board[toRow][toCol] = piece;           // игрок → на место компьютера
-            board[fromRow][fromCol] = targetPiece; // компьютер → на место игрока
-
-            // ===== ВАЖНО: НИЧЕГО НЕ МЕНЯЕМ! =====
-            // piece.player остаётся 0 (игрок)
-            // targetPiece.player остаётся 1 (компьютер)
-            // piece.color остаётся тем же (red/green/blue)
-            // targetPiece.color остаётся тем же (red/green/blue)
-
+            board[toRow][toCol] = piece;
+            board[fromRow][fromCol] = targetPiece;
             sounds.swap();
+            
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('medium');
+            }
+            
             showMessage('Шашки поменялись местами', '#ff9800');
         } else {
-            // Обычный ход
             board[toRow][toCol] = piece;
             sounds.move();
+            
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('light');
+            }
         }
-
+        
         draw();
         checkGameOver();
-
-        if (gameActive) {
+        
+        if (gameActive && !isGameOver) {
             currentPlayer = 1;
             updateUI();
             showMessage('Ход компьютера...', '#ff9800');
@@ -395,7 +487,9 @@ function makeMoveAnimated(fromRow, fromCol, toRow, toCol, moveInfo) {
     });
 }
 
-// ===== ПРОВЕРКА КОНЦА ИГРЫ =====
+// ============================================================
+// ПРОВЕРКА КОНЦА ИГРЫ
+// ============================================================
 function hasPlayerMoves() {
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
@@ -460,33 +554,107 @@ function checkGameOver() {
     else if (!hasComputerMoves() && currentPlayer === 1) endGame('player');
 }
 
+// ===== ЗАВЕРШЕНИЕ ИГРЫ =====
 function endGame(winner) {
+    if (isGameOver) return;
+    isGameOver = true;
     gameActive = false;
-    const message = winner === 'player' ? '🏆 ПОБЕДИЛ ИГРОК! 🏆' : '🏆 ПОБЕДИЛ КОМПЬЮТЕР! 🏆';
-    showMessage(message, winner === 'player' ? '#4CAF50' : '#f44336');
-
+    isAnimating = false;
+    
+    const isPlayerWin = winner === 'player';
+    const message = isPlayerWin ? '🏆 ПОБЕДИЛ ИГРОК! 🏆' : '🏆 ПОБЕДИЛ КОМПЬЮТЕР! 🏆';
+    
+    showMessage(message, isPlayerWin ? '#4CAF50' : '#f44336');
+    
     const turnEl = document.getElementById('turnIndicator');
-    turnEl.classList.remove('computer-turn');
-    turnEl.classList.add('game-over');
-    turnEl.textContent = winner === 'player' ? '🏆 ПОБЕДА!' : '💀 ПОРАЖЕНИЕ';
-
-    if (winner === 'player') sounds.win();
-    else sounds.lose();
-
-    if (typeof saveGameResult === 'function') {
-        saveGameResult(difficulty, winner);
+    if (turnEl) {
+        turnEl.classList.remove('computer-turn');
+        turnEl.classList.add('game-over');
+        turnEl.textContent = isPlayerWin ? '🏆 ПОБЕДА!' : '💀 ПОРАЖЕНИЕ';
     }
-
+    
+    if (isPlayerWin) {
+        sounds.win();
+        if (typeof hapticFeedback === 'function') {
+            hapticFeedback('success');
+        }
+    } else {
+        sounds.lose();
+        if (typeof hapticFeedback === 'function') {
+            hapticFeedback('error');
+        }
+    }
+    
+    // Сохраняем статистику
+    try {
+        if (typeof saveGameResult === 'function') {
+            saveGameResult(difficulty, winner);
+        }
+    } catch (e) {
+        console.warn('Ошибка сохранения статистики:', e);
+    }
+    
+    // Сохраняем в таблицу лидеров
+    if (isPlayerWin && playerScore > 0) {
+        try {
+            if (typeof saveScoreToLeaderboard === 'function') {
+                const leaderboardScore = Math.round(playerScore * 10 +
+                    (difficulty === 'hard' ? 50 : difficulty === 'medium' ? 25 : 0));
+                saveScoreToLeaderboard(leaderboardScore, { difficulty: difficulty });
+                console.log('✅ Рекорд отправлен в таблицу лидеров');
+            }
+        } catch (e) {
+            console.warn('Ошибка сохранения в лидеры:', e);
+        }
+    }
+    
+    // Запрос отзыва после победы
+    if (isPlayerWin && typeof canRequestReview === 'function' && canRequestReview()) {
+        setTimeout(() => {
+            if (typeof requestReview === 'function') {
+                requestReview().then((success) => {
+                    if (success) console.log('✅ Отзыв успешно запрошен');
+                }).catch(() => {});
+            }
+        }, 2000);
+    }
+    
+    // Показываем рекламу после игры
     setTimeout(() => {
         if (confirm(`${message}\n\nХотите сыграть ещё?`)) {
             location.reload();
         } else {
-            location.href = 'start.html';
+            if (typeof showInterstitialAd === 'function') {
+                setTimeout(() => {
+                    showInterstitialAd(
+                        () => {
+                            try {
+                                if (typeof syncStats === 'function') {
+                                    syncStats().then(() => {
+                                        location.href = 'start.html';
+                                    }).catch(() => {
+                                        location.href = 'start.html';
+                                    });
+                                } else {
+                                    location.href = 'start.html';
+                                }
+                            } catch (e) {
+                                location.href = 'start.html';
+                            }
+                        },
+                        () => { location.href = 'start.html'; }
+                    );
+                }, 300);
+            } else {
+                location.href = 'start.html';
+            }
         }
     }, 800);
 }
 
-// ===== MINIMAX ИИ (для HARD) =====
+// ============================================================
+// MINIMAX ИИ (для HARD)
+// ============================================================
 function getAllMoves(boardState, player) {
     const moves = [];
     for (let i = 0; i < 8; i++) {
@@ -505,11 +673,9 @@ function getAllMoves(boardState, player) {
                         moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'move', piece: p });
                     }
                     if (isDiag && target && target.player !== player) {
-                        // Захват: хищник vs жертва (разные цвета)
                         if (PREDATOR[p.color] === target.color) {
                             moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'capture', piece: p, target });
                         }
-                        // Обмен: одинаковые цвета (нейтральные)
                         if (p.color === target.color) {
                             moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'swap', piece: p, target });
                         }
@@ -556,7 +722,7 @@ function minimax(boardState, depth, alpha, beta, isMaximizing) {
     const player = isMaximizing ? 1 : 0;
     const moves = getAllMoves(boardState, player);
     if (moves.length === 0) return isMaximizing ? -1000 : 1000;
-
+    
     if (isMaximizing) {
         let maxEval = -Infinity;
         for (const move of moves) {
@@ -587,16 +753,15 @@ function minimax(boardState, depth, alpha, beta, isMaximizing) {
 function getBestMoveMinimax(depth = 3) {
     const moves = getAllMoves(board, 1);
     if (moves.length === 0) return null;
-    let bestMove = null;
     let bestScore = -Infinity;
     const bestMoves = [];
-
+    
     for (const move of moves) {
         const newBoard = simulateMove(board, move);
         let score = minimax(newBoard, depth - 1, -Infinity, Infinity, false);
         if (move.type === 'capture') score += 50;
         else if (move.type === 'swap') score += 20;
-
+        
         if (score > bestScore) {
             bestScore = score;
             bestMoves.length = 0;
@@ -608,10 +773,12 @@ function getBestMoveMinimax(depth = 3) {
     return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 }
 
-// ===== ХОД КОМПЬЮТЕРА =====
+// ============================================================
+// ХОД КОМПЬЮТЕРА
+// ============================================================
 function computerMove() {
-    if (!gameActive || currentPlayer !== 1) return;
-
+    if (!gameActive || currentPlayer !== 1 || isGameOver) return;
+    
     const computerPieces = [];
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
@@ -620,9 +787,9 @@ function computerMove() {
         }
     }
     if (computerPieces.length === 0) { endGame('player'); return; }
-
+    
     let selectedMove = null;
-
+    
     if (difficulty === 'easy') {
         const moves = getAllMoves(board, 1);
         if (moves.length === 0) {
@@ -667,45 +834,50 @@ function computerMove() {
             return;
         }
     }
-
+    
     const from = selectedMove.from;
     const to = selectedMove.to;
     const piece = board[from.row][from.col];
     board[from.row][from.col] = null;
-
+    
     animateMove(from.row, from.col, to.row, to.col, piece, () => {
         if (selectedMove.type === 'capture') {
             board[to.row][to.col] = piece;
             computerScore++;
             sounds.capture();
+            
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('heavy');
+            }
+            
             updateUI();
             showMessage('Компьютер съел вашу шашку!', '#f44336');
         } else if (selectedMove.type === 'swap') {
-            // ===== ОБМЕН МЕСТАМИ (SWAP) ДЛЯ КОМПЬЮТЕРА =====
             const targetPiece = board[to.row][to.col];
-
-            // Меняем местами, СОХРАНЯЯ все свойства
-            board[to.row][to.col] = piece;           // компьютер → на место игрока
-            board[from.row][from.col] = targetPiece; // игрок → на место компьютера
-
-            // ===== ВАЖНО: НИЧЕГО НЕ МЕНЯЕМ! =====
-            // piece.player остаётся 1 (компьютер)
-            // targetPiece.player остаётся 0 (игрок)
-            // piece.color остаётся тем же
-            // targetPiece.color остаётся тем же
-
+            board[to.row][to.col] = piece;
+            board[from.row][from.col] = targetPiece;
             sounds.swap();
+            
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('medium');
+            }
+            
             showMessage('Компьютер поменялся шашками', '#ff9800');
         } else {
             board[to.row][to.col] = piece;
             sounds.move();
+            
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('light');
+            }
+            
             showMessage('Компьютер сделал ход', '#ff9800');
         }
-
+        
         draw();
         checkGameOver();
-
-        if (gameActive) {
+        
+        if (gameActive && !isGameOver) {
             currentPlayer = 0;
             updateUI();
             showMessage('Ваш ход. Выберите шашку', '#4CAF50');
@@ -713,17 +885,22 @@ function computerMove() {
     });
 }
 
-// ===== РАССТАНОВКА =====
+// ============================================================
+// РАССТАНОВКА
+// ============================================================
 function startPlacementEasy() {
     waitingForPlacement = true;
     placementRemaining = 12;
     document.getElementById('placementPanel').style.display = 'block';
     const container = document.getElementById('colorSelector');
     container.innerHTML = '';
+    
     for (const color of COLORS) {
         const btn = document.createElement('button');
         btn.className = 'color-btn';
-        btn.textContent = EMOJI[color];
+        // Используем цветной круг через background
+        btn.style.background = `radial-gradient(circle at 30% 30%, ${lightenColor(COLOR_MAP[color], 40)}, ${COLOR_MAP[color]})`;
+        btn.textContent = '';
         btn.onclick = () => {
             initAudio();
             sounds.click();
@@ -756,7 +933,9 @@ function startPlacementMedium() {
 function updateMediumDisplay() {
     if (placementIndex < 12) {
         const color = placementColors[placementIndex];
-        document.getElementById('mediumPiece').textContent = EMOJI[color];
+        const mediumPiece = document.getElementById('mediumPiece');
+        mediumPiece.style.background = `radial-gradient(circle at 30% 30%, ${lightenColor(COLOR_MAP[color], 40)}, ${COLOR_MAP[color]})`;
+        mediumPiece.textContent = '';
         document.getElementById('mediumText').textContent = `Поставьте ${getColorName(color)} шашку (осталось ${12 - placementIndex})`;
     }
 }
@@ -830,13 +1009,15 @@ function handlePlacement(row, col) {
     return true;
 }
 
-// ===== ОБРАБОТКА КЛИКОВ =====
+// ============================================================
+// ОБРАБОТКА КЛИКОВ
+// ============================================================
 function handleClick(e) {
     if (!gameActive && !waitingForPlacement) return;
-    if (isAnimating) return;
-
+    if (isAnimating || isGameOver) return;
+    
     initAudio();
-
+    
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -846,19 +1027,19 @@ function handleClick(e) {
     const col = Math.floor(x / cell);
     const row = Math.floor(y / cell);
     if (row < 0 || row >= 8 || col < 0 || col >= 8) return;
-
+    
     if (waitingForPlacement) {
         handlePlacement(row, col);
         return;
     }
-
+    
     if (currentPlayer !== 0) {
         showMessage('Сейчас ход компьютера', '#f44336');
         return;
     }
-
+    
     const piece = board[row][col];
-
+    
     if (selectedPiece === null) {
         if (piece && piece.player === 0) {
             selectedPiece = { row, col, piece };
@@ -893,11 +1074,154 @@ function handleClick(e) {
     }
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
+// ============================================================
+// ОБРАБОТЧИКИ КНОПОК
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const soundBtn = document.getElementById('soundBtn');
+    if (soundBtn) {
+        soundBtn.addEventListener('click', toggleSound);
+    }
+    
+    const exitBtn = document.getElementById('exitBtn');
+    if (exitBtn) {
+        exitBtn.addEventListener('click', () => {
+            sounds.click();
+            if (confirm('Выйти в главное меню?')) {
+                if (typeof showInterstitialAd === 'function' && !isGameOver) {
+                    showInterstitialAd(
+                        () => { location.href = 'start.html'; },
+                        () => { location.href = 'start.html'; }
+                    );
+                } else {
+                    location.href = 'start.html';
+                }
+            }
+        });
+    }
+    
+    // Кнопка полноэкранного режима
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', async () => {
+            if (typeof sounds !== 'undefined' && sounds.click) sounds.click();
+            
+            try {
+                if (typeof ysdk !== 'undefined' && ysdk && ysdk.screen) {
+                    await ysdk.screen.fullscreen.request();
+                    fullscreenBtn.classList.add('active');
+                    console.log('✅ Полноэкранный режим через SDK');
+                } else if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                    fullscreenBtn.classList.add('active');
+                    console.log('✅ Полноэкранный режим через браузер');
+                }
+            } catch (e) {
+                console.warn('⚠️ Не удалось включить fullscreen:', e);
+                if (typeof showMessage === 'function') {
+                    showMessage('Полноэкранный режим недоступен', '#ff9800');
+                }
+            }
+        });
+        
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.classList.remove('active');
+            }
+        });
+        
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitFullscreenElement) {
+                fullscreenBtn.classList.remove('active');
+            }
+        });
+    }
+    
+    // Кнопка "+3 очка за рекламу"
+    const rewardedBtn = document.getElementById('rewardedBtn');
+    if (rewardedBtn) {
+        rewardedBtn.addEventListener('click', async function() {
+            if (isGameOver) {
+                showMessage('Игра уже завершена. Начните новую игру.', '#ff9800');
+                return;
+            }
+            if (typeof sounds !== 'undefined' && sounds.click) sounds.click();
+            
+            let available = false;
+            if (typeof checkRewardedAdReady === 'function') {
+                available = await checkRewardedAdReady();
+            }
+            if (!available) {
+                showMessage('Реклама временно недоступна. Попробуйте позже.', '#f44336');
+                return;
+            }
+            
+            if (typeof showRewardedAd === 'function') {
+                showRewardedAd(
+                    () => {
+                        playerScore += 3;
+                        updateUI();
+                        showMessage('🎁 +3 очка за просмотр рекламы!', '#4CAF50');
+                        
+                        if (typeof hapticFeedback === 'function') {
+                            hapticFeedback('success');
+                        }
+                        
+                        try {
+                            if (typeof savePlayerData === 'function') {
+                                const stats = typeof loadStats === 'function' ? loadStats() : null;
+                                if (stats) savePlayerData(stats);
+                            }
+                        } catch (e) {}
+                    },
+                    (error) => {
+                        showMessage('Ошибка загрузки рекламы. Попробуйте позже.', '#f44336');
+                    },
+                    () => {
+                        showMessage('Реклама закрыта. Награда не получена.', '#ff9800');
+                    }
+                );
+            } else {
+                showMessage('Функция рекламы недоступна', '#f44336');
+            }
+        });
+    }
+    
+    // Кнопка "Поделиться"
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+            if (typeof sounds !== 'undefined' && sounds.click) sounds.click();
+            const message = `🎮 Я сыграл в "Битву полководцев"!\n🏆 Мои очки: ${playerScore}\n🤖 Счёт компьютера: ${computerScore}\n🎯 Сложность: ${DIFFICULTY_LABELS[difficulty] || difficulty}\nПопробуй и ты! ⚔️`;
+            
+            if (typeof shareResult === 'function') {
+                shareResult(message);
+            } else if (navigator.share) {
+                navigator.share({
+                    title: 'Битва полководцев',
+                    text: message,
+                    url: window.location.href
+                }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(message + ' ' + window.location.href);
+                alert('📋 Результат скопирован! Поделитесь с друзьями.');
+            } else {
+                alert('Функция шаринга недоступна');
+            }
+        });
+    }
+});
+
+// ============================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================================
 function initGame() {
+    isGameOver = false;
     resizeCanvas();
+    
     setTimeout(() => {
         initBoard();
+        
         if (difficulty === 'easy') {
             const compPos = getComputerPositions();
             const order = ['red', 'green', 'blue'];
@@ -934,6 +1258,7 @@ function initGame() {
             for (let i = 0; i < 12; i++) {
                 board[shuffledComp[i].row][shuffledComp[i].col] = { color: compColors[i], player: 1 };
             }
+            
             const playerPos = getPlayerPositions();
             const shuffledPlayer = [...playerPos];
             for (let i = shuffledPlayer.length - 1; i > 0; i--) {
@@ -945,6 +1270,7 @@ function initGame() {
             for (let i = 0; i < 12; i++) {
                 board[shuffledPlayer[i].row][shuffledPlayer[i].col] = { color: playerColors[i], player: 0 };
             }
+            
             gameActive = true;
             currentPlayer = 0;
             showMessage('Игра началась! Ваш ход', '#4CAF50');
@@ -963,13 +1289,8 @@ canvas.addEventListener('touchstart', (e) => {
     handleClick(click);
 }, { passive: false });
 
-document.getElementById('soundBtn').addEventListener('click', toggleSound);
-document.getElementById('exitBtn').addEventListener('click', () => {
-    sounds.click();
-    if (confirm('Выйти в главное меню?')) location.href = 'start.html';
-});
-
 window.addEventListener('resize', resizeCanvas);
+
 window.addEventListener('load', () => {
     setTimeout(() => {
         initGame();
