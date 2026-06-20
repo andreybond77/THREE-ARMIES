@@ -1,0 +1,224 @@
+/* ============================================================
+   ГЛАВНОЕ МЕНЮ — ВСЕ СТИЛИ ВНУТРИ .start-page
+   ============================================================ */
+
+.start-page {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.start-container {
+    position: relative;
+    max-width: 750px;
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    text-align: center;
+}
+
+.start-title {
+    text-align: center;
+    font-size: 32px;
+    margin: 0 0 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.start-title-gradient {
+    background: linear-gradient(135deg, #ff4444, #4CAF50, #2196F3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+}
+
+.start-title-emoji {
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: white;
+    color: white;
+    display: inline-block;
+}
+
+.start-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.start-btn {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+    width: 100%;
+    letter-spacing: 0.5px;
+}
+
+.start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+.start-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.start-btn-rules { background: linear-gradient(135deg, #607D8B, #37474F); }
+.start-btn-difficulty { background: linear-gradient(135deg, #ff9800, #e65100); }
+.start-btn-play { background: linear-gradient(135deg, #4CAF50, #2e7d32); }
+.start-btn-stats { background: linear-gradient(135deg, #2196F3, #0d47a1); }
+.start-btn-auth { background: linear-gradient(135deg, #ffcc00, #ffaa00); color: #333; }
+
+.start-age-rating {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 152, 0, 0.2);
+    border: 1px solid rgba(255, 152, 0, 0.4);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #ffcc80;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.start-description {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.start-description p {
+    margin: 8px 0;
+    line-height: 1.5;
+    color: #ddd;
+}
+
+.start-inspirational {
+    background: linear-gradient(135deg, rgba(255,152,0,0.2), rgba(255,68,68,0.2));
+    border-radius: 20px;
+    padding: 15px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.start-inspirational p {
+    margin: 0;
+    color: #ffcc80;
+}
+
+.start-footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 12px;
+}
+
+.start-footer-email, .start-footer-copyright {
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+/* ===== МОБИЛЬНЫЕ ===== */
+@media (max-width: 600px) {
+    .start-page {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+    .start-container {
+        padding: 20px 15px;
+        border-radius: 20px;
+    }
+    .start-title {
+        font-size: 24px;
+    }
+    .start-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+    .start-description p {
+        font-size: 13px;
+    }
+    .start-age-rating {
+        top: 10px;
+        right: 10px;
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .start-title {
+        font-size: 20px;
+    }
+    .start-btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+    .start-age-rating {
+        top: 8px;
+        right: 8px;
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .start-container {
+        padding: 35px;
+    }
+    .start-title {
+        font-size: 40px;
+    }
+    .start-btn {
+        padding: 16px;
+        font-size: 18px;
+    }
+}
+/* ===== БАННЕРНАЯ РЕКЛАМА ===== */
+.banner-ad-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: 50px;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 2px solid #ff9800;
+}
+
+.banner-ad-container:empty {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .banner-ad-container {
+        min-height: 40px;
+    }
+}
