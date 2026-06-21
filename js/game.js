@@ -44,6 +44,9 @@ let isGameOver = false;
 
 const COLORS = ['red', 'green', 'blue'];
 const EMOJI = { red: '🔴', green: '🟢', blue: '🔵' };
+// 🔴 КРАСНАЯ → ест → 🟢 ЗЕЛЁНУЮ
+// 🟢 ЗЕЛЁНАЯ → ест → 🔵 СИНЮЮ
+// 🔵 СИНЯЯ → ест → 🔴 КРАСНУЮ
 const PREDATOR = { red: 'green', green: 'blue', blue: 'red' };
 
 // Цветовая карта для отрисовки шашек
@@ -97,6 +100,11 @@ const sounds = {
     swap: () => {
         playTone(330, 0.1, 'triangle', 0.2);
         setTimeout(() => playTone(440, 0.1, 'triangle', 0.2), 80);
+    },
+    preyEaten: () => {
+        playTone(600, 0.08, 'sine', 0.3);
+        setTimeout(() => playTone(300, 0.15, 'sawtooth', 0.25), 50);
+        setTimeout(() => playTone(150, 0.2, 'square', 0.2), 100);
     },
     win: () => {
         [523, 659, 784, 1047].forEach((freq, i) => {
@@ -153,9 +161,7 @@ async function hapticFeedback(type = 'light') {
             };
             await ysdk.hapticFeedback.impactOccurred(impactTypes[type] || 'light');
             return;
-        } catch (e) {
-            // Fallback
-        }
+        } catch (e) {}
     }
     if ('vibrate' in navigator) {
         const patterns = {
@@ -242,7 +248,7 @@ function updateUI() {
 }
 
 // ============================================================
-// ОТРИСОВКА ШАШЕК (ЦВЕТНЫЕ КРУГИ ВМЕСТО ЭМОДЗИ)
+// ОТРИСОВКА ШАШЕК
 // ============================================================
 function lightenColor(color, percent) {
     const num = parseInt(color.replace('#', ''), 16);
@@ -253,10 +259,12 @@ function lightenColor(color, percent) {
     return `rgb(${R}, ${G}, ${B})`;
 }
 
-function drawPieceAt(x, y, piece, cell) {
+function drawPieceAt(x, y, piece, cell, highlightColor = null) {
     const radius = cell / 2 - 4;
+    const color = COLOR_MAP[piece.color] || '#888';
+    const innerRadius = radius * 0.55;
     
-    // 1. Основа шашки (белая для игрока, тёмная для компьютера)
+    // 1. Основа шашки (чёрная область)
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = piece.player === 0 ? '#ffffff' : '#222222';
@@ -266,9 +274,6 @@ function drawPieceAt(x, y, piece, cell) {
     ctx.stroke();
     
     // 2. Цветной круг внутри шашки
-    const color = COLOR_MAP[piece.color] || '#888';
-    const innerRadius = radius * 0.55;
-    
     const gradient = ctx.createRadialGradient(
         x - innerRadius * 0.3, y - innerRadius * 0.3, innerRadius * 0.2,
         x, y, innerRadius
@@ -284,10 +289,22 @@ function drawPieceAt(x, y, piece, cell) {
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.lineWidth = Math.max(1, cell / 60);
     ctx.stroke();
+    
+    // 3. Подсветка (тонкий контур на границе цветного круга)
+    if (highlightColor) {
+        ctx.beginPath();
+        ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = highlightColor;
+        ctx.lineWidth = Math.max(3, cell / 20);
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = highlightColor;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    }
 }
 
 // ============================================================
-// ОТРИСОВКА ДОСКИ
+// ОТРИСОВКА ДОСКИ С ПОДСВЕТКОЙ
 // ============================================================
 function draw() {
     if (canvas.width === 0 || canvas.height === 0) return;
@@ -300,7 +317,12 @@ function draw() {
             const isDark = (row + col) % 2 === 1;
             ctx.fillStyle = isDark ? '#8B4513' : '#F0D9B5';
             ctx.fillRect(col * cell, row * cell, cell, cell);
-            
+        }
+    }
+    
+    // Сначала рисуем все шашки
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
             const piece = board[row][col];
             if (piece) {
                 const x = col * cell + cell / 2;
@@ -310,39 +332,59 @@ function draw() {
         }
     }
     
-    // Подсветка выбранной шашки
+    // Потом рисуем подсветку поверх шашек
     if (selectedPiece) {
         const x = selectedPiece.col * cell;
         const y = selectedPiece.row * cell;
+        
+        // Жёлтая рамка вокруг выбранной шашки
         ctx.strokeStyle = '#FFD700';
         ctx.lineWidth = Math.max(3, cell / 20);
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#FFD700';
         ctx.strokeRect(x + 2, y + 2, cell - 4, cell - 4);
-    }
-    
-    // Подсветка валидных ходов
-    if (selectedPiece && validMoves.length > 0) {
+        ctx.shadowBlur = 0;
+        
+        // Подсветка шашек соперника
         for (const move of validMoves) {
-            const x = move.col * cell + cell / 2;
-            const y = move.row * cell + cell / 2;
-            const radius = cell / 4;
+            const targetPiece = board[move.row][move.col];
+            if (!targetPiece || targetPiece.player === 0) continue;
             
-            if (move.type === 'capture') {
-                ctx.beginPath();
-                ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(244, 67, 54, 0.9)';
-                ctx.lineWidth = Math.max(3, cell / 15);
-                ctx.stroke();
+            const tx = move.col * cell + cell / 2;
+            const ty = move.row * cell + cell / 2;
+            
+            // Определяем цвет подсветки для шашки соперника
+            let highlightColor = null;
+            if (move.type === 'prey') {
+                // 💚 ЯРКО-САЛАТОВЫЙ — вы можете съесть шашку соперника
+                highlightColor = '#7FFF00';
+            } else if (move.type === 'capture') {
+                // 🌸 ЯРКО-РОЗОВЫЙ — соперник может съесть вашу шашку
+                highlightColor = '#FF1493';
             } else if (move.type === 'swap') {
+                // 🟡 ЗОЛОТОЙ — одинаковые цвета (можно поменяться)
+                highlightColor = '#FFD700';
+            }
+            
+            if (highlightColor) {
+                // Перерисовываем шашку с подсветкой поверх
+                drawPieceAt(tx, ty, targetPiece, cell, highlightColor);
+            }
+        }
+        
+        // Подсветка пустых клеток для обычных ходов (зелёные точки)
+        for (const move of validMoves) {
+            if (move.type === 'move') {
+                const mx = move.col * cell + cell / 2;
+                const my = move.row * cell + cell / 2;
+                const radius = cell / 6;
                 ctx.beginPath();
-                ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 193, 7, 0.9)';
-                ctx.lineWidth = Math.max(3, cell / 15);
-                ctx.stroke();
-            } else {
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(76, 175, 80, 0.55)';
+                ctx.arc(mx, my, radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(76, 175, 80, 0.5)';
                 ctx.fill();
+                ctx.strokeStyle = 'rgba(76, 175, 80, 0.8)';
+                ctx.lineWidth = Math.max(1, cell / 40);
+                ctx.stroke();
             }
         }
     }
@@ -368,18 +410,31 @@ function isValidMove(piece, fromRow, fromCol, toRow, toCol) {
     const dx = toCol - fromCol;
     const dy = toRow - fromRow;
     const isMove = (Math.abs(dx) + Math.abs(dy) === 1) && (dx === 0 || dy === 0);
-    const isCapture = (Math.abs(dx) === 1 && Math.abs(dy) === 1);
+    const isDiag = (Math.abs(dx) === 1 && Math.abs(dy) === 1);
     
+    // Обычный ход на пустую клетку
     if (isMove && target === null) return { valid: true, type: 'move' };
     
-    if (isCapture && target && target.player === 1) {
+    // Диагональное взаимодействие
+    if (isDiag && target && target.player !== piece.player) {
+        // 1. ЖЕРТВА: если вы можете съесть соперника → 💚 САЛАТОВЫЙ
+        // Пример: у вас 🔴, у соперника 🟢 → PREDATOR[red] = green → true
         if (PREDATOR[piece.color] === target.color) {
+            return { valid: true, type: 'prey', target };
+        }
+        
+        // 2. ХИЩНИК: если соперник может съесть вас → 🌸 РОЗОВЫЙ
+        // Пример: у вас 🟢, у соперника 🔴 → PREDATOR[red] = green → true
+        if (PREDATOR[target.color] === piece.color) {
             return { valid: true, type: 'capture', target };
         }
+        
+        // 3. НЕЙТРАЛЬНЫЕ: одинаковые цвета → 🟡 ЗОЛОТОЙ
         if (piece.color === target.color) {
             return { valid: true, type: 'swap', target };
         }
     }
+    
     return { valid: false };
 }
 
@@ -394,7 +449,12 @@ function calculateValidMoves(row, col) {
             if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                 const result = isValidMove(piece, row, col, nr, nc);
                 if (result.valid) {
-                    moves.push({ row: nr, col: nc, type: result.type, target: result.target });
+                    moves.push({ 
+                        row: nr, 
+                        col: nc, 
+                        type: result.type, 
+                        target: result.target 
+                    });
                 }
             }
         }
@@ -435,7 +495,7 @@ function animateMove(fromRow, fromCol, toRow, toCol, piece, callback) {
     requestAnimationFrame(frame);
 }
 
-// ===== ВЫПОЛНЕНИЕ ХОДА С АНИМАЦИЕЙ И HAPTIC =====
+// ===== ВЫПОЛНЕНИЕ ХОДА С АНИМАЦИЕЙ =====
 function makeMoveAnimated(fromRow, fromCol, toRow, toCol, moveInfo) {
     const piece = board[fromRow][fromCol];
     selectedPiece = null;
@@ -444,32 +504,47 @@ function makeMoveAnimated(fromRow, fromCol, toRow, toCol, moveInfo) {
     board[fromRow][fromCol] = null;
     
     animateMove(fromRow, fromCol, toRow, toCol, piece, () => {
-        if (moveInfo.type === 'capture') {
+        if (moveInfo.type === 'prey') {
+            // 💚 ВЫ СЪЕДАЕТЕ ШАШКУ СОПЕРНИКА (+1 очко игроку)
             board[toRow][toCol] = piece;
             playerScore++;
             sounds.capture();
-            
             if (typeof hapticFeedback === 'function') {
                 hapticFeedback('heavy');
             }
-            
             updateUI();
             showMessage(`+1 очко! Съедена ${getColorName(moveInfo.target.color)} шашка`, '#4CAF50');
+            
+        } else if (moveInfo.type === 'capture') {
+            // 🌸 СОПЕРНИК СЪЕДАЕТ ВАШУ ШАШКУ (+1 очко сопернику)
+            const predator = board[toRow][toCol];
+            // Ваша шашка (жертва) уничтожается
+            board[fromRow][fromCol] = null;
+            // Хищник остаётся на месте
+            board[toRow][toCol] = predator;
+            computerScore++; // СОПЕРНИК ПОЛУЧАЕТ ОЧКО!
+            sounds.preyEaten();
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('error');
+            }
+            updateUI();
+            showMessage(`💀 Ваша ${getColorName(piece.color)} шашка уничтожена! Компьютер +1 очко`, '#f44336');
+            
         } else if (moveInfo.type === 'swap') {
+            // 🟡 НЕЙТРАЛЬНЫЕ меняются местами
             const targetPiece = board[toRow][toCol];
             board[toRow][toCol] = piece;
             board[fromRow][fromCol] = targetPiece;
             sounds.swap();
-            
             if (typeof hapticFeedback === 'function') {
                 hapticFeedback('medium');
             }
-            
             showMessage('Шашки поменялись местами', '#ff9800');
+            
         } else {
+            // ⬜ Обычный ход
             board[toRow][toCol] = piece;
             sounds.move();
-            
             if (typeof hapticFeedback === 'function') {
                 hapticFeedback('light');
             }
@@ -526,6 +601,7 @@ function hasComputerMoves() {
                             if (isStraight && target === null) return true;
                             if (isDiag && target && target.player === 0) {
                                 if (PREDATOR[p.color] === target.color) return true;
+                                if (PREDATOR[target.color] === p.color) return true;
                                 if (p.color === target.color) return true;
                             }
                         }
@@ -554,7 +630,9 @@ function checkGameOver() {
     else if (!hasComputerMoves() && currentPlayer === 1) endGame('player');
 }
 
-// ===== ЗАВЕРШЕНИЕ ИГРЫ =====
+// ============================================================
+// ЗАВЕРШЕНИЕ ИГРЫ
+// ============================================================
 function endGame(winner) {
     if (isGameOver) return;
     isGameOver = true;
@@ -585,7 +663,6 @@ function endGame(winner) {
         }
     }
     
-    // Сохраняем статистику
     try {
         if (typeof saveGameResult === 'function') {
             saveGameResult(difficulty, winner);
@@ -594,7 +671,6 @@ function endGame(winner) {
         console.warn('Ошибка сохранения статистики:', e);
     }
     
-    // Сохраняем в таблицу лидеров
     if (isPlayerWin && playerScore > 0) {
         try {
             if (typeof saveScoreToLeaderboard === 'function') {
@@ -608,7 +684,6 @@ function endGame(winner) {
         }
     }
     
-    // Запрос отзыва после победы
     if (isPlayerWin && typeof canRequestReview === 'function' && canRequestReview()) {
         setTimeout(() => {
             if (typeof requestReview === 'function') {
@@ -619,7 +694,6 @@ function endGame(winner) {
         }, 2000);
     }
     
-    // Показываем рекламу после игры
     setTimeout(() => {
         if (confirm(`${message}\n\nХотите сыграть ещё?`)) {
             location.reload();
@@ -673,9 +747,15 @@ function getAllMoves(boardState, player) {
                         moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'move', piece: p });
                     }
                     if (isDiag && target && target.player !== player) {
+                        // ЖЕРТВА: игрок может съесть соперника
                         if (PREDATOR[p.color] === target.color) {
+                            moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'prey', piece: p, target });
+                        }
+                        // ХИЩНИК: соперник может съесть игрока
+                        if (PREDATOR[target.color] === p.color) {
                             moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'capture', piece: p, target });
                         }
+                        // НЕЙТРАЛЬНЫЕ
                         if (p.color === target.color) {
                             moves.push({ from: {row: i, col: j}, to: {row: nr, col: nc}, type: 'swap', piece: p, target });
                         }
@@ -690,9 +770,16 @@ function getAllMoves(boardState, player) {
 function simulateMove(boardState, move) {
     const newBoard = boardState.map(row => row.slice());
     const piece = newBoard[move.from.row][move.from.col];
-    newBoard[move.to.row][move.to.col] = piece;
-    newBoard[move.from.row][move.from.col] = null;
-    return newBoard;
+    
+    if (move.type === 'capture') {
+        // 🌸 ХИЩНИК съедает жертву → жертва уничтожается
+        newBoard[move.from.row][move.from.col] = null;
+        return newBoard;
+    } else {
+        newBoard[move.to.row][move.to.col] = piece;
+        newBoard[move.from.row][move.from.col] = null;
+        return newBoard;
+    }
 }
 
 function evaluateBoard(boardState) {
@@ -728,7 +815,8 @@ function minimax(boardState, depth, alpha, beta, isMaximizing) {
         for (const move of moves) {
             const newBoard = simulateMove(boardState, move);
             let evalScore = minimax(newBoard, depth - 1, alpha, beta, false);
-            if (move.type === 'capture') evalScore += 50;
+            if (move.type === 'prey') evalScore += 50;
+            else if (move.type === 'capture') evalScore -= 30;
             else if (move.type === 'swap') evalScore += 20;
             maxEval = Math.max(maxEval, evalScore);
             alpha = Math.max(alpha, evalScore);
@@ -740,7 +828,8 @@ function minimax(boardState, depth, alpha, beta, isMaximizing) {
         for (const move of moves) {
             const newBoard = simulateMove(boardState, move);
             let evalScore = minimax(newBoard, depth - 1, alpha, beta, true);
-            if (move.type === 'capture') evalScore -= 50;
+            if (move.type === 'prey') evalScore -= 50;
+            else if (move.type === 'capture') evalScore += 30;
             else if (move.type === 'swap') evalScore -= 20;
             minEval = Math.min(minEval, evalScore);
             beta = Math.min(beta, evalScore);
@@ -759,7 +848,8 @@ function getBestMoveMinimax(depth = 3) {
     for (const move of moves) {
         const newBoard = simulateMove(board, move);
         let score = minimax(newBoard, depth - 1, -Infinity, Infinity, false);
-        if (move.type === 'capture') score += 50;
+        if (move.type === 'prey') score += 50;
+        else if (move.type === 'capture') score -= 30;
         else if (move.type === 'swap') score += 20;
         
         if (score > bestScore) {
@@ -806,7 +896,11 @@ function computerMove() {
             return;
         }
         for (const move of moves) {
-            let extra = move.type === 'capture' ? 100 : (move.type === 'swap' ? 30 : 0);
+            let extra = 0;
+            if (move.type === 'prey') extra = 100;
+            else if (move.type === 'capture') extra = -50;
+            else if (move.type === 'swap') extra = 30;
+            
             for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
                     if (dr === 0 && dc === 0) continue;
@@ -815,7 +909,7 @@ function computerMove() {
                         const nearby = board[cr][cc];
                         if (nearby && nearby.player === 0) {
                             if (PREDATOR[move.piece.color] === nearby.color) extra += 50;
-                            if (PREDATOR[nearby.color] === move.piece.color) extra -= 30;
+                            if (PREDATOR[nearby.color] === move.piece.color) extra -= 40;
                         }
                     }
                 }
@@ -841,36 +935,46 @@ function computerMove() {
     board[from.row][from.col] = null;
     
     animateMove(from.row, from.col, to.row, to.col, piece, () => {
-        if (selectedMove.type === 'capture') {
+        if (selectedMove.type === 'prey') {
+            // Компьютер съедает шашку игрока (+1 очко компьютеру)
             board[to.row][to.col] = piece;
             computerScore++;
             sounds.capture();
-            
             if (typeof hapticFeedback === 'function') {
                 hapticFeedback('heavy');
             }
-            
             updateUI();
-            showMessage('Компьютер съел вашу шашку!', '#f44336');
+            showMessage(`Компьютер съел вашу шашку!`, '#f44336');
+            
+        } else if (selectedMove.type === 'capture') {
+            // Компьютер напал на хищника → его шашка уничтожается (+1 очко игроку)
+            const predator = board[to.row][to.col];
+            board[from.row][from.col] = null;
+            board[to.row][to.col] = predator;
+            playerScore++; // ИГРОК ПОЛУЧАЕТ ОЧКО!
+            sounds.preyEaten();
+            if (typeof hapticFeedback === 'function') {
+                hapticFeedback('error');
+            }
+            updateUI();
+            showMessage(`💀 Компьютер потерял шашку! Вы получаете +1 очко`, '#4CAF50');
+            
         } else if (selectedMove.type === 'swap') {
             const targetPiece = board[to.row][to.col];
             board[to.row][to.col] = piece;
             board[from.row][from.col] = targetPiece;
             sounds.swap();
-            
             if (typeof hapticFeedback === 'function') {
                 hapticFeedback('medium');
             }
-            
             showMessage('Компьютер поменялся шашками', '#ff9800');
+            
         } else {
             board[to.row][to.col] = piece;
             sounds.move();
-            
             if (typeof hapticFeedback === 'function') {
                 hapticFeedback('light');
             }
-            
             showMessage('Компьютер сделал ход', '#ff9800');
         }
         
@@ -898,7 +1002,6 @@ function startPlacementEasy() {
     for (const color of COLORS) {
         const btn = document.createElement('button');
         btn.className = 'color-btn';
-        // Используем цветной круг через background
         btn.style.background = `radial-gradient(circle at 30% 30%, ${lightenColor(COLOR_MAP[color], 40)}, ${COLOR_MAP[color]})`;
         btn.textContent = '';
         btn.onclick = () => {
@@ -1045,7 +1148,24 @@ function handleClick(e) {
             selectedPiece = { row, col, piece };
             validMoves = calculateValidMoves(row, col);
             sounds.select();
-            showMessage(`Выбрана ${getColorName(piece.color)} шашка. ${validMoves.length > 0 ? 'Выберите клетку' : 'Нет доступных ходов'}`, '#4CAF50');
+            
+            const captures = validMoves.filter(m => m.type === 'capture').length;
+            const preys = validMoves.filter(m => m.type === 'prey').length;
+            const swaps = validMoves.filter(m => m.type === 'swap').length;
+            const moves = validMoves.filter(m => m.type === 'move').length;
+            
+            let msg = `Выбрана ${getColorName(piece.color)} шашка. `;
+            if (validMoves.length === 0) {
+                msg += 'Нет доступных ходов';
+            } else {
+                const parts = [];
+                if (preys > 0) parts.push(`💚 съесть ${preys}`);
+                if (captures > 0) parts.push(`🌸 опасно ${captures}`);
+                if (swaps > 0) parts.push(`🟡 поменяться ${swaps}`);
+                if (moves > 0) parts.push(`⬜ ход ${moves}`);
+                msg += parts.join(', ');
+            }
+            showMessage(msg, '#4CAF50');
             draw();
         } else {
             showMessage('Выберите свою шашку', '#f44336');
@@ -1100,7 +1220,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Кнопка полноэкранного режима
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', async () => {
@@ -1137,7 +1256,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Кнопка "+3 очка за рекламу"
     const rewardedBtn = document.getElementById('rewardedBtn');
     if (rewardedBtn) {
         rewardedBtn.addEventListener('click', async function() {
@@ -1187,7 +1305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Кнопка "Поделиться"
     const shareBtn = document.getElementById('shareBtn');
     if (shareBtn) {
         shareBtn.addEventListener('click', function() {
